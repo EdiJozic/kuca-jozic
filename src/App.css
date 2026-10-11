@@ -2880,6 +2880,250 @@ body {
   white-space: nowrap;
 }
 
+.availability-page {
+  min-height: calc(100svh - 206px);
+  padding-bottom: 88px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(208 190 160 / 20%), transparent 44%),
+    #f4f0e8;
+  animation: galleryPageEnter 650ms cubic-bezier(0.2, 0.65, 0.3, 1) both;
+}
+
+.availability-intro {
+  padding: 94px 7.1% 48px;
+  text-align: center;
+}
+
+.availability-intro h1 {
+  margin: 0;
+  color: #332d26;
+  font: 400 clamp(43px, 5.6vw, 72px)/1.1 var(--serif);
+  letter-spacing: -1.5px;
+}
+
+.availability-intro h1 em {
+  color: #a67c4f;
+  font-weight: 400;
+}
+
+.availability-intro > p {
+  max-width: 540px;
+  margin: 21px auto 0;
+  color: #756d62;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.availability-content {
+  width: min(1060px, 85.8%);
+  margin: 0 auto;
+}
+
+.availability-calendar-card {
+  padding: clamp(24px, 4.5vw, 52px);
+  border: 1px solid #ded5c8;
+  background: #fbf9f4;
+  box-shadow: 0 24px 70px rgb(62 46 27 / 8%);
+}
+
+.availability-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e7dfd3;
+}
+
+.availability-calendar-header h2 {
+  margin: 8px 0 0;
+  color: #332d26;
+  font: 400 clamp(27px, 3.2vw, 38px)/1.2 var(--serif);
+}
+
+.availability-calendar-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.availability-calendar-controls button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #d9cdbc;
+  border-radius: 50%;
+  background: transparent;
+  color: #6d5a43;
+  cursor: pointer;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.availability-calendar-controls button:hover:not(:disabled) {
+  border-color: #9a7040;
+  background: #9a7040;
+  color: #fffaf2;
+}
+
+.availability-calendar-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.availability-months {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 6vw, 72px);
+  padding: 30px 0;
+}
+
+.availability-month {
+  min-width: 0;
+}
+
+.availability-month h3 {
+  margin: 0 0 19px;
+  color: #393127;
+  font: 400 21px/1.3 var(--serif);
+  text-transform: capitalize;
+}
+
+.availability-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.availability-weekdays {
+  margin-bottom: 8px;
+}
+
+.availability-weekdays span {
+  padding: 4px 0;
+  color: #9a8d7d;
+  font-size: 9px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.availability-day,
+.availability-day-empty {
+  display: grid;
+  min-width: 0;
+  aspect-ratio: 1;
+  place-items: center;
+}
+
+.availability-day {
+  border-radius: 50%;
+  color: #554c40;
+  font-size: 11px;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.availability-day-open:not(.availability-day-past):hover {
+  background: #eee6d9;
+}
+
+.availability-day-closed {
+  background: #a76f5b;
+  color: #fffaf2;
+  text-decoration: line-through;
+}
+
+.availability-day-past {
+  color: #bcb4a8;
+}
+
+.availability-calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 19px;
+  border-top: 1px solid #e7dfd3;
+}
+
+.availability-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.availability-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #756d62;
+  font-size: 10px;
+}
+
+.availability-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.availability-legend-open {
+  border: 1px solid #c9bba7;
+}
+
+.availability-legend-closed {
+  background: #a76f5b;
+}
+
+.availability-calendar-footer > p {
+  max-width: 330px;
+  margin: 0;
+  color: #82796d;
+  font-size: 10px;
+  line-height: 1.7;
+  text-align: right;
+}
+
+.availability-manual-note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 24px;
+  margin-top: 20px;
+  padding: 22px 25px;
+  border: 1px solid #e3dacd;
+  background: rgb(251 249 244 / 65%);
+}
+
+.availability-manual-note p {
+  grid-column: 1;
+  margin: 0;
+  color: #756d62;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.availability-manual-note > span {
+  grid-column: 1;
+  color: #9a8d7d;
+  font-size: 10px;
+}
+
+.availability-manual-note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #8d673f;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+}
+
+.availability-manual-note a svg {
+  transition: transform 180ms ease;
+}
+
+.availability-manual-note a:hover svg {
+  transform: translate(2px, -2px);
+}
+
 @keyframes quoteFloat {
   0%, 100% {
     transform: translateY(0);
@@ -2890,6 +3134,10 @@ body {
 }
 
 @media (max-width: 1100px) {
+  .availability-content {
+    width: 90%;
+  }
+
   .amenities-heading {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 22px;
@@ -2926,6 +3174,80 @@ body {
 }
 
 @media (max-width: 700px) {
+  .availability-page {
+    padding-bottom: 60px;
+  }
+
+  .availability-intro {
+    padding: 74px 22px 34px;
+  }
+
+  .availability-intro h1 {
+    font-size: clamp(39px, 10vw, 56px);
+    letter-spacing: -1px;
+  }
+
+  .availability-intro > p {
+    font-size: 12px;
+  }
+
+  .availability-content {
+    width: auto;
+    margin: 0 20px;
+  }
+
+  .availability-calendar-card {
+    padding: 22px 17px;
+  }
+
+  .availability-months {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 23px 0;
+  }
+
+  .availability-month:nth-child(2) {
+    display: none;
+  }
+
+  .availability-calendar-header {
+    padding-bottom: 18px;
+  }
+
+  .availability-calendar-controls button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .availability-days {
+    gap: 3px;
+  }
+
+  .availability-day,
+  .availability-day-empty {
+    max-width: 44px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .availability-calendar-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .availability-calendar-footer > p {
+    text-align: left;
+  }
+
+  .availability-manual-note {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 19px;
+  }
+
+  .availability-manual-note p,
+  .availability-manual-note > span {
+    grid-column: 1;
+  }
+
   .amenities-section {
     padding: 72px 22px 76px;
   }

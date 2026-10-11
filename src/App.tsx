@@ -103,6 +103,13 @@ const galleryCategories: GalleryCategory[] = [
   },
 ];
 
+// Closed periods include both dates; any dates between ranges remain available.
+// Edit these ranges and publish the site to update the public calendar.
+const closedDateRanges: { start: string; end: string }[] = [
+  { start: "2026-10-11", end: "2026-10-17" },
+  { start: "2026-12-01", end: "2026-12-31" },
+];
+
 const galleryImageFiles = import.meta.glob<string>(
   "./assets/*/*.{avif,jpg,jpeg,png,webp}",
   { eager: true, query: "?url", import: "default" },
@@ -332,6 +339,18 @@ const copy = {
     galleryPhotos: "PHOTOS",
     galleryEmpty: "Photos coming soon.",
     contact: "Contact",
+    availability: "Availability",
+    availabilityEyebrow: "PLAN YOUR STAY",
+    availabilityTitle: "Find your dates\nfor a little escape.",
+    availabilityIntro:
+      "Browse the calendar to see dates currently marked as booked for Kuća za odmor Jožić.",
+    availabilityOpen: "Available",
+    availabilityClosed: "Booked",
+    availabilityManualNote:
+      "This calendar is updated manually and is not synchronized with booking platforms. Please contact us to confirm availability before making plans.",
+    availabilityContact: "ASK ABOUT YOUR DATES",
+    availabilityNote:
+      "Up to 6 guests · Private heated pool · No pets",
     contactEyebrow: "WE'D LOVE TO HEAR FROM YOU",
     contactTitle: "A warm welcome\nstarts here.",
     contactIntro:
@@ -403,6 +422,18 @@ const copy = {
     galleryPhotos: "FOTOS",
     galleryEmpty: "Fotos folgen in Kürze.",
     contact: "Kontakt",
+    availability: "Verfügbarkeit",
+    availabilityEyebrow: "PLANEN SIE IHREN AUFENTHALT",
+    availabilityTitle: "Finden Sie Ihre Reisedaten\nfür eine kleine Auszeit.",
+    availabilityIntro:
+      "Im Kalender sehen Sie die aktuell als belegt markierten Termine für das Ferienhaus Jožić.",
+    availabilityOpen: "Verfügbar",
+    availabilityClosed: "Belegt",
+    availabilityManualNote:
+      "Dieser Kalender wird manuell aktualisiert und ist nicht mit Buchungsplattformen synchronisiert. Bitte kontaktieren Sie uns, um die Verfügbarkeit vor Ihrer Planung zu bestätigen.",
+    availabilityContact: "TERMIN ANFRAGEN",
+    availabilityNote:
+      "Bis zu 6 Gäste · Privater beheizter Pool · Keine Haustiere",
     contactEyebrow: "WIR FREUEN UNS AUF IHRE NACHRICHT",
     contactTitle: "Ein herzliches Willkommen\nbeginnt hier.",
     contactIntro:
@@ -438,6 +469,133 @@ const copy = {
 };
 
 type Copy = (typeof copy)[Language];
+
+function AvailabilityCalendar({
+  language,
+  labels,
+}: {
+  language: Language;
+  labels: Pick<Copy, "availabilityOpen" | "availabilityClosed">;
+}) {
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
+  const locale = language === "en" ? "en-GB" : "de-DE";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const firstWeekday = (date: Date) => (date.getDay() + 6) % 7;
+  const weekdays = Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(2024, 0, index + 1)),
+  );
+  const months = [
+    visibleMonth,
+    new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1),
+  ];
+
+  const shiftMonth = (offset: number) => {
+    setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() + offset, 1));
+  };
+
+  return (
+    <div className="availability-calendar-card">
+      <div className="availability-calendar-header">
+        <div>
+          <span className="amenity-index">
+            {language === "en" ? "BOOKING CALENDAR" : "BELEGUNGSKALENDER"}
+          </span>
+          <h2>{language === "en" ? "Find your moment." : "Finden Sie Ihren Moment."}</h2>
+        </div>
+        <div className="availability-calendar-controls">
+          <button
+            type="button"
+            aria-label={language === "en" ? "Previous month" : "Vorheriger Monat"}
+            disabled={
+              visibleMonth.getFullYear() === today.getFullYear() &&
+              visibleMonth.getMonth() === today.getMonth()
+            }
+            onClick={() => shiftMonth(-1)}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            aria-label={language === "en" ? "Next month" : "Nächster Monat"}
+            onClick={() => shiftMonth(1)}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="availability-months">
+        {months.map((month) => {
+          const year = month.getFullYear();
+          const monthNumber = month.getMonth();
+          const daysInMonth = new Date(year, monthNumber + 1, 0).getDate();
+          const blanks = firstWeekday(month);
+
+          return (
+            <section className="availability-month" key={`${year}-${monthNumber}`}>
+              <h3>
+                {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(month)}
+              </h3>
+              <div className="availability-days availability-weekdays">
+                {weekdays.map((weekday, index) => (
+                  <span key={`${weekday}-${index}`}>{weekday}</span>
+                ))}
+              </div>
+              <div className="availability-days">
+                {Array.from({ length: blanks }, (_, index) => (
+                  <span className="availability-day-empty" key={`empty-${index}`} />
+                ))}
+                {Array.from({ length: daysInMonth }, (_, index) => {
+                  const day = index + 1;
+                  const date = new Date(year, monthNumber, day);
+                  const dateKey = [
+                    year,
+                    String(monthNumber + 1).padStart(2, "0"),
+                    String(day).padStart(2, "0"),
+                  ].join("-");
+                  const isClosed = closedDateRanges.some(
+                    (range) => dateKey >= range.start && dateKey <= range.end,
+                  );
+                  const isPast = date < today;
+                  const status = isClosed ? labels.availabilityClosed : labels.availabilityOpen;
+
+                  return (
+                    <span
+                      aria-label={`${new Intl.DateTimeFormat(locale, {
+                        dateStyle: "long",
+                      }).format(date)}: ${status}`}
+                      className={`availability-day availability-day-${isClosed ? "closed" : "open"}${isPast ? " availability-day-past" : ""}`}
+                      key={dateKey}
+                      title={`${day}: ${status}`}
+                    >
+                      {day}
+                    </span>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      <div className="availability-calendar-footer">
+        <div className="availability-legend">
+          <span><i className="availability-legend-open" />{labels.availabilityOpen}</span>
+          <span><i className="availability-legend-closed" />{labels.availabilityClosed}</span>
+        </div>
+        <p>
+          {language === "en"
+            ? "Dates are indicative. Contact us to confirm your stay."
+            : "Die Termine dienen zur Orientierung. Bitte kontaktieren Sie uns zur Bestätigung."}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 const amenityGroups: {
   title: Record<Language, string>;
@@ -715,6 +873,7 @@ function App() {
       if (window.location.hash === "#neighborhood" || window.location.hash === "#guide") return "neighborhood";
       if (window.location.hash.startsWith("#gallery")) return "gallery";
       if (window.location.hash === "#contact") return "contact";
+      if (window.location.hash === "#availability") return "availability";
       return "home";
     },
   );
@@ -763,7 +922,9 @@ function App() {
           ? "gallery"
           : window.location.hash === "#contact"
             ? "contact"
-            : "home";
+            : window.location.hash === "#availability"
+              ? "availability"
+              : "home";
       if (nextPage !== currentPage) window.scrollTo(0, 0);
       setCurrentPage(nextPage);
     };
@@ -786,13 +947,15 @@ function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selectedGalleryImage, moveGalleryImage]);
 
-  const navigateTo = (page: "home" | "neighborhood" | "gallery" | "contact") => {
+  const navigateTo = (page: "home" | "neighborhood" | "gallery" | "contact" | "availability") => {
     const hash = page === "neighborhood"
       ? "#neighborhood"
       : page === "gallery"
         ? "#gallery"
         : page === "contact"
           ? "#contact"
+          : page === "availability"
+            ? "#availability"
           : "#home";
     if (window.location.hash !== hash) window.history.pushState(null, "", hash);
     setCurrentPage(page);
@@ -853,6 +1016,16 @@ function App() {
             }}
           >
             {t.gallery}
+          </a>
+          <a
+            className={currentPage === "availability" ? "nav-link-active" : ""}
+            href="#availability"
+            onClick={(event) => {
+              event.preventDefault();
+              navigateTo("availability");
+            }}
+          >
+            {t.availability}
           </a>
           <a
             className={currentPage === "contact" ? "nav-link-active" : ""}
@@ -953,6 +1126,32 @@ function App() {
                 )}
               </section>
             ))}
+          </div>
+        </section>
+      ) : currentPage === "availability" ? (
+        <section className="availability-page">
+          <header className="availability-intro">
+            <span className="eyebrow gallery-eyebrow">
+              <span className="eyebrow-line" />
+              {t.availabilityEyebrow}
+            </span>
+            <h1>
+              {t.availabilityTitle.split("\n")[0]}
+              <br />
+              <em>{t.availabilityTitle.split("\n")[1]}</em>
+            </h1>
+            <p>{t.availabilityIntro}</p>
+          </header>
+          <div className="availability-content">
+            <AvailabilityCalendar language={language} labels={t} />
+            <div className="availability-manual-note">
+              <p>{t.availabilityManualNote}</p>
+              <span>{t.availabilityNote}</span>
+              <a href="mailto:kucajozic1@gmail.com?subject=Availability%20inquiry">
+                {t.availabilityContact}
+                <ArrowUpRight size={16} />
+              </a>
+            </div>
           </div>
         </section>
       ) : currentPage === "contact" ? (
