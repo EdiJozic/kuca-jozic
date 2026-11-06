@@ -1196,7 +1196,7 @@ function App() {
 
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
-  }, [category, currentPage]);
+  }, [category, currentPage, houseInfo]);
 
   useEffect(() => {
     const syncPage = () => {
