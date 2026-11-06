@@ -185,25 +185,6 @@
         "hr": "Trgovački park s trgovinama za modu, dom i svakodnevnu kupovinu."
       },
       "category": "shop"
-    },
-    {
-      "name": "test",
-      "visible": true,
-      "distance": "test",
-      "maps": "test",
-      "tip": {
-        "hr": "test",
-        "de": "test",
-        "en": "test"
-      },
-      "id": 1,
-      "image": "/images/uploads/modern-gradient-3840x2160-25337.jpg",
-      "description": {
-        "hr": "test",
-        "de": "test",
-        "en": "test"
-      },
-      "category": "restaurant"
     }
   ]
 }
