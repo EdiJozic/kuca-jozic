@@ -1,5 +1,7 @@
 
 import { useCallback, useEffect, useState } from "react";
+import { divIcon } from "leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -20,9 +22,10 @@ import {
   X,
 } from "lucide-react";
 import logo from "./assets/logo-dark.png";
+import "leaflet/dist/leaflet.css";
 import "./App.css";
 
-type Language = "en" | "de";
+type Language = "en" | "de" | "hr";
 type Category = "all" | "restaurant" | "shop";
 
 type Place = {
@@ -47,68 +50,70 @@ type GalleryCategory = {
 const galleryCategories: GalleryCategory[] = [
   {
     folder: "kuca_vani",
-    title: { en: "The house & outdoors", de: "Haus & Außenbereich" },
+    title: { en: "The house & outdoors", de: "Haus & Außenbereich", hr: "Kuća i vanjski prostor" },
     description: {
       en: "A first look at your private countryside retreat.",
       de: "Ein erster Blick auf Ihren privaten Rückzugsort auf dem Land.",
+      hr: "Zavirite u svoju privatnu kuću za odmor u prirodi.",
     },
   },
   {
     folder: "bazen",
-    title: { en: "Pool", de: "Pool" },
+    title: { en: "Pool", de: "Pool", hr: "Bazen" },
     description: {
       en: "Slow afternoons, cool water and sunshine.",
       de: "Entspannte Nachmittage, kühles Wasser und Sonnenschein.",
+      hr: "Opuštena poslijepodneva uz osvježavajuću vodu i sunce.",
     },
   },
   {
     folder: "dnevni boravak",
-    title: { en: "Living room", de: "Wohnzimmer" },
+    title: { en: "Living room", de: "Wohnzimmer", hr: "Dnevni boravak" },
     description: {
       en: "Comfortable corners made for spending time together.",
       de: "Gemütliche Ecken für gemeinsame Zeit.",
+      hr: "Udobni kutci stvoreni za zajedničke trenutke.",
     },
   },
   {
     folder: "kuhinja",
-    title: { en: "Kitchen", de: "Küche" },
+    title: { en: "Kitchen", de: "Küche", hr: "Kuhinja" },
     description: {
       en: "Everything you need for an easy meal at home.",
       de: "Alles, was Sie für eine entspannte Mahlzeit brauchen.",
+      hr: "Sve što vam treba za opušten obrok kod kuće.",
     },
   },
   {
     folder: "spavaca soba",
-    title: { en: "Bedrooms", de: "Schlafzimmer" },
+    title: { en: "Bedrooms", de: "Schlafzimmer", hr: "Spavaće sobe" },
     description: {
       en: "Quiet, welcoming spaces to recharge.",
       de: "Ruhige, einladende Räume zum Auftanken.",
+      hr: "Mirne i ugodne sobe za odmor i novi početak dana.",
     },
   },
   {
     folder: "spa zona",
-    title: { en: "Spa area", de: "Wellnessbereich" },
+    title: { en: "Spa area", de: "Wellnessbereich", hr: "Spa zona" },
     description: {
       en: "A little extra time to unwind and reset.",
       de: "Ein wenig mehr Zeit zum Entspannen und Abschalten.",
+      hr: "Malo više vremena za opuštanje i predah.",
     },
   },
   {
     folder: "wc",
-    title: { en: "Bathrooms", de: "Badezimmer" },
+    title: { en: "Bathrooms", de: "Badezimmer", hr: "Kupaonice" },
     description: {
       en: "Clean, considered details for your stay.",
       de: "Klare, durchdachte Details für Ihren Aufenthalt.",
+      hr: "Uredni i pažljivo osmišljeni detalji za ugodan boravak.",
     },
   },
 ];
 
-// Closed periods include both dates; any dates between ranges remain available.
-// Edit these ranges and publish the site to update the public calendar.
-const closedDateRanges: { start: string; end: string }[] = [
-  { start: "2026-10-11", end: "2026-10-17" },
-  { start: "2026-12-01", end: "2026-12-31" },
-];
+type AvailabilityRange = { from: string; to: string };
 
 const galleryImageFiles = import.meta.glob<string>(
   "./assets/*/*.{avif,jpg,jpeg,png,webp}",
@@ -139,10 +144,12 @@ const places: Place[] = [
     description: {
       en: "Local flavours, thoughtful cooking and a beautiful countryside setting.",
       de: "Regionale Aromen, sorgfältige Küche und eine wunderschöne ländliche Umgebung.",
+      hr: "Lokalni okusi, pažljivo pripremljena jela i prekrasno seosko okruženje.",
     },
     tip: {
       en: "Ask about the local seasonal specialities.",
       de: "Fragen Sie nach den saisonalen Spezialitäten der Region.",
+      hr: "Raspitajte se o lokalnim sezonskim specijalitetima.",
     },
     address: "Zlatne Gorice, Varaždin",
     phone: "+385 42 123 456",
@@ -158,10 +165,12 @@ const places: Place[] = [
     description: {
       en: "A relaxed local favourite for pizza, pasta and an easy-going evening.",
       de: "Ein beliebter Ort für Pizza, Pasta und einen entspannten Abend.",
+      hr: "Omiljeno lokalno mjesto za pizzu, tjesteninu i opuštenu večer.",
     },
     tip: {
       en: "A lovely choice for a casual family dinner.",
       de: "Eine schöne Wahl für ein entspanntes Abendessen mit der Familie.",
+      hr: "Odličan izbor za opuštenu obiteljsku večeru.",
     },
     address: "Pizzeria Špan, Varaždin area",
     phone: "+385 42 345 678",
@@ -177,10 +186,12 @@ const places: Place[] = [
     description: {
       en: "Traditional home-style cooking in a warm, welcoming atmosphere.",
       de: "Traditionelle Hausmannskost in einer warmen, einladenden Atmosphäre.",
+      hr: "Tradicionalna domaća kuhinja u toplom i ugodnom ambijentu.",
     },
     tip: {
       en: "Consider reserving a table on weekends.",
       de: "Am Wochenende empfiehlt sich eine Tischreservierung.",
+      hr: "Vikendom preporučujemo rezervaciju stola.",
     },
     address: "Restaurant Bernarda",
     phone: "+385 42 234 567",
@@ -196,10 +207,12 @@ const places: Place[] = [
     description: {
       en: "Your nearby stop for groceries, fresh produce and everyday essentials.",
       de: "Ihr Supermarkt in der Nähe für Lebensmittel und Dinge des täglichen Bedarfs.",
+      hr: "Trgovina u blizini za namirnice, svježe proizvode i svakodnevne potrepštine.",
     },
     tip: {
       en: "A convenient option for stocking up after arrival.",
       de: "Ideal, um sich nach der Ankunft mit allem Nötigen einzudecken.",
+      hr: "Praktično mjesto za nabavu nakon dolaska.",
     },
     address: "Jalžabet, Croatia",
     phone: "+385 42 456 789",
@@ -215,10 +228,12 @@ const places: Place[] = [
     description: {
       en: "A familiar fast-food option when you want something quick and easy.",
       de: "Eine bekannte Fast-Food-Option für eine schnelle und unkomplizierte Mahlzeit.",
+      hr: "Poznati fast-food izbor kada želite brz i jednostavan obrok.",
     },
     tip: {
       en: "Useful for a quick meal while visiting Varaždin.",
       de: "Praktisch für eine schnelle Mahlzeit bei einem Besuch in Varaždin.",
+      hr: "Dobro za brz obrok tijekom posjeta Varaždinu.",
     },
     address: "Varaždin, Croatia",
     maps: "https://www.google.com/maps/search/?api=1&query=KFC+Varazdin",
@@ -233,10 +248,12 @@ const places: Place[] = [
     description: {
       en: "Shopping, dining and entertainment all in one place.",
       de: "Shopping, Gastronomie und Unterhaltung an einem Ort.",
+      hr: "Kupovina, gastronomija i zabava na jednom mjestu.",
     },
     tip: {
       en: "A good rainy-day option for the whole family.",
       de: "Eine gute Idee für einen Regentag mit der ganzen Familie.",
+      hr: "Dobar izbor za kišni dan s cijelom obitelji.",
     },
     address: "Lumini Shopping Centre",
     maps: "https://www.google.com/maps/search/?api=1&query=Lumini+Varazdin",
@@ -251,10 +268,12 @@ const places: Place[] = [
     description: {
       en: "A large supermarket with a wide range of groceries and essentials.",
       de: "Ein großer Supermarkt mit einer breiten Auswahl an Lebensmitteln.",
+      hr: "Veliki supermarket s bogatom ponudom namirnica i potrepština.",
     },
     tip: {
       en: "Convenient for a larger grocery shop.",
       de: "Praktisch für einen größeren Einkauf.",
+      hr: "Praktično za veću kupovinu namirnica.",
     },
     address: "Koprivnička 17, Varaždin",
     phone: "0800 223 223",
@@ -270,10 +289,12 @@ const places: Place[] = [
     description: {
       en: "A practical supermarket for groceries and daily essentials.",
       de: "Ein praktischer Supermarkt für Lebensmittel und Dinge des täglichen Bedarfs.",
+      hr: "Praktičan supermarket za namirnice i svakodnevne potrepštine.",
     },
     tip: {
       en: "Combine your shopping with a visit to Ludbreg.",
       de: "Verbinden Sie den Einkauf mit einem Besuch in Ludbreg.",
+      hr: "Spojite kupovinu s posjetom Ludbregu.",
     },
     address: "Ludbreg, Croatia",
     phone: "+385 42 272 100",
@@ -289,10 +310,12 @@ const places: Place[] = [
     description: {
       en: "A retail park with several stores for fashion, home and everyday shopping.",
       de: "Ein Einkaufspark mit Geschäften für Mode, Wohnen und den täglichen Bedarf.",
+      hr: "Trgovački park s trgovinama za modu, dom i svakodnevnu kupovinu.",
     },
     tip: {
       en: "Several useful shops in one convenient stop.",
       de: "Mehrere praktische Geschäfte an einem Ort.",
+      hr: "Više korisnih trgovina na jednome mjestu.",
     },
     address: "STOP SHOP Ludbreg",
     maps: "https://www.google.com/maps/search/?api=1&query=STOP+SHOP+Ludbreg",
@@ -308,6 +331,20 @@ const copy = {
     explore: "EXPLORE THE GUIDE",
     scroll: "SCROLL TO DISCOVER",
     label: "THE NEIGHBOURHOOD",
+    backToTop: "BACK TO TOP",
+    menuToggle: "Toggle navigation",
+    previousPhoto: "Previous photo",
+    nextPhoto: "Next photo",
+    county: "VARAŽDIN COUNTY · CROATIA",
+    family: "Jožić family",
+    curatedWithCare: "CURATED WITH CARE",
+    placesCount: "PLACES",
+    dining: "DINING",
+    shopping: "SHOPPING",
+    quoteFirst: "The best memories are made",
+    quoteSecond: "when you have time to enjoy them.",
+    quoteCaption: "A LITTLE MORE TIME. A LITTLE MORE LIFE.",
+    modalImageLabel: "THE LOCAL EDIT",
     homeNav: "Home",
     neighborhoodTitle: "The neighbourhood",
     neighborhoodHeadline: "Good places.\nBeautiful moments.",
@@ -343,11 +380,11 @@ const copy = {
     availabilityEyebrow: "PLAN YOUR STAY",
     availabilityTitle: "Find your dates\nfor a little escape.",
     availabilityIntro:
-      "Browse the calendar to see dates currently marked as booked for Kuća za odmor Jožić.",
+      "See the latest stay dates offered for Kuća za odmor Jožić.",
     availabilityOpen: "Available",
-    availabilityClosed: "Booked",
-    availabilityManualNote:
-      "This calendar is updated manually and is not synchronized with booking platforms. Please contact us to confirm availability before making plans.",
+    availabilityClosed: "Unavailable",
+    availabilityLoading: "Loading live availability…",
+    availabilityError: "Live availability could not be loaded.",
     availabilityContact: "ASK ABOUT YOUR DATES",
     availabilityNote:
       "Up to 6 guests · Private heated pool · No pets",
@@ -366,6 +403,10 @@ const copy = {
       "Make yourself at home, find your favourite corner and enjoy a stay shaped around your own pace.",
     homeGalleryLink: "EXPLORE THE HOUSE",
     homeNeighborhoodLink: "DISCOVER THE NEIGHBOURHOOD",
+    homeMapEyebrow: "FIND YOUR WAY HERE",
+    homeMapTitle: "Your stay, right here.",
+    homeMapAddress: "Novakovščak 98",
+    homeMapLink: "OPEN IN GOOGLE MAPS",
     amenitiesEyebrow: "THE HOUSE AT A GLANCE",
     amenitiesTitle: "A home with room for six.",
     amenitiesIntro: "Stone-built, surrounded by nature and thoughtfully equipped for relaxed family holidays.",
@@ -391,6 +432,20 @@ const copy = {
     explore: "GUIDE ENTDECKEN",
     scroll: "WEITER ENTDECKEN",
     label: "DIE UMGEBUNG",
+    backToTop: "NACH OBEN",
+    menuToggle: "Navigation umschalten",
+    previousPhoto: "Vorheriges Foto",
+    nextPhoto: "Nächstes Foto",
+    county: "GES PANSCHAFT VARAŽDIN · KROATIEN",
+    family: "Familie Jožić",
+    curatedWithCare: "MIT SORGFALT AUSGEWÄHLT",
+    placesCount: "ORTE",
+    dining: "GASTRONOMIE",
+    shopping: "EINKAUFEN",
+    quoteFirst: "Die schönsten Erinnerungen entstehen,",
+    quoteSecond: "wenn man Zeit hat, sie zu genießen.",
+    quoteCaption: "MEHR ZEIT. MEHR LEBEN.",
+    modalImageLabel: "LOKALE EMPFEHLUNG",
     homeNav: "Startseite",
     neighborhoodTitle: "Die Umgebung",
     neighborhoodHeadline: "Schöne Orte.\nBesondere Momente.",
@@ -426,11 +481,11 @@ const copy = {
     availabilityEyebrow: "PLANEN SIE IHREN AUFENTHALT",
     availabilityTitle: "Finden Sie Ihre Reisedaten\nfür eine kleine Auszeit.",
     availabilityIntro:
-      "Im Kalender sehen Sie die aktuell als belegt markierten Termine für das Ferienhaus Jožić.",
+      "Sehen Sie die aktuell verfügbaren Termine für das Ferienhaus Jožić.",
     availabilityOpen: "Verfügbar",
-    availabilityClosed: "Belegt",
-    availabilityManualNote:
-      "Dieser Kalender wird manuell aktualisiert und ist nicht mit Buchungsplattformen synchronisiert. Bitte kontaktieren Sie uns, um die Verfügbarkeit vor Ihrer Planung zu bestätigen.",
+    availabilityClosed: "Nicht verfügbar",
+    availabilityLoading: "Aktuelle Verfügbarkeit wird geladen…",
+    availabilityError: "Die aktuelle Verfügbarkeit konnte nicht geladen werden.",
     availabilityContact: "TERMIN ANFRAGEN",
     availabilityNote:
       "Bis zu 6 Gäste · Privater beheizter Pool · Keine Haustiere",
@@ -449,6 +504,10 @@ const copy = {
       "Fühlen Sie sich wie zu Hause, finden Sie Ihren Lieblingsplatz und genießen Sie Ihren Aufenthalt in Ihrem eigenen Tempo.",
     homeGalleryLink: "DAS HAUS ENTDECKEN",
     homeNeighborhoodLink: "UMGEBUNG ENTDECKEN",
+    homeMapEyebrow: "SO FINDEN SIE UNS",
+    homeMapTitle: "Ihr Aufenthalt, genau hier.",
+    homeMapAddress: "Novakovščak 98",
+    homeMapLink: "IN GOOGLE MAPS ÖFFNEN",
     amenitiesEyebrow: "DAS HAUS AUF EINEN BLICK",
     amenitiesTitle: "Ein Zuhause mit Platz für sechs.",
     amenitiesIntro: "Ein Haus aus Stein, umgeben von Natur und ausgestattet für entspannte Familienferien.",
@@ -466,22 +525,231 @@ const copy = {
     nearbyTravel: "In der Region",
     distanceLabel: "ENTFERNUNG",
   },
+  hr: {
+    eyebrow: "PRIVATNI SMJEŠTAJ · LOKALNI DOŽIVLJAJ",
+    headline: "Otkrijte ljepotu\nsporijeg ritma.",
+    intro:
+      "Mali vodič kroz naša omiljena mjesta, pažljivo odabrana za vaš boravak u Kući za odmor Jožić.",
+    explore: "ISTRAŽITE VODIČ",
+    scroll: "POMAKNITE ZA VIŠE",
+    label: "OKOLICA",
+    backToTop: "POVRATAK NA VRH",
+    menuToggle: "Otvori ili zatvori navigaciju",
+    previousPhoto: "Prethodna fotografija",
+    nextPhoto: "Sljedeća fotografija",
+    county: "VARAŽDINSKA ŽUPANIJA · HRVATSKA",
+    family: "Obitelj Jožić",
+    curatedWithCare: "PAŽLJIVO ODABRANO",
+    placesCount: "MJESTA",
+    dining: "GASTRONOMIJA",
+    shopping: "KUPNJA",
+    quoteFirst: "Najljepše uspomene nastaju",
+    quoteSecond: "kad imamo vremena uživati u njima.",
+    quoteCaption: "MALO VIŠE VREMENA. MALO VIŠE ŽIVOTA.",
+    modalImageLabel: "LOKALNA PREPORUKA",
+    homeNav: "Početna",
+    neighborhoodTitle: "Okolica",
+    neighborhoodHeadline: "Lijepa mjesta.\nPosebni trenuci.",
+    neighborhoodIntro:
+      "Od opuštenih večera do svakodnevnih potrepština, istražite najbolje u okolici svojim tempom.",
+    title: "Boravak po\nvašoj mjeri.",
+    subtitle:
+      "Uživajte u mirnim jutrima uz bazen, opustite se u spa zoni i osjećajte se kao kod kuće.",
+    all: "Sve",
+    restaurant: "Restorani",
+    shop: "Trgovine",
+    view: "Otkrijte mjesto",
+    distance: "OD SMJEŠTAJA",
+    close: "Zatvori",
+    tip: "LOKALNI SAVJET",
+    address: "ADRESA",
+    directions: "PRIKAŽI RUTU",
+    call: "NAZOVITE",
+    footer: "Za boravke za pamćenje.",
+    home: "VAŠ DOM IZVAN DOMA",
+    count: "PROSTOR ZA OPUŠTANJE",
+    homeIntroEyebrow: "MJESTO U KOJEM SE OSJEĆATE KAO KOD KUĆE",
+    gallery: "Galerija",
+    galleryEyebrow: "ZAVIRITE UNUTRA",
+    galleryTitle: "Kuća,\niz svakog kuta.",
+    galleryIntro:
+      "Istražite prostore zbog kojih je Kuća za odmor Jožić savršeno mjesto za predah i osjećaj doma.",
+    galleryBack: "POVRATAK NA POČETNU",
+    galleryPhotos: "FOTOGRAFIJE",
+    galleryEmpty: "Fotografije uskoro stižu.",
+    contact: "Kontakt",
+    availability: "Dostupnost",
+    availabilityEyebrow: "ISPLANIRAJTE BORAVAK",
+    availabilityTitle: "Pronađite svoj termin\nza mali bijeg.",
+    availabilityIntro:
+      "Provjerite aktualnu dostupnost Kuće za odmor Jožić.",
+    availabilityOpen: "Dostupno",
+    availabilityClosed: "Zauzeto",
+    availabilityLoading: "Učitavanje aktualne dostupnosti…",
+    availabilityError: "Dostupnost trenutačno nije moguće učitati.",
+    availabilityContact: "PITAJTE ZA TERMIN",
+    availabilityNote:
+      "Do 6 gostiju · Privatni grijani bazen · Kućni ljubimci nisu dopušteni",
+    contactEyebrow: "VESELIMO SE VAŠOJ PORUCI",
+    contactTitle: "Srdačna dobrodošlica\npočinje ovdje.",
+    contactIntro:
+      "Imate pitanje o boravku? Javite nam se ili zapratite svakodnevicu u Kući za odmor Jožić.",
+    contactEmail: "E-POŠTA",
+    contactPhone: "TELEFON",
+    contactWhatsapp: "WHATSAPP",
+    contactSocial: "PRATITE NAS",
+    contactNote: "Veselimo se što ćemo vas ugostiti.",
+    homeFeatureEyebrow: "VAŠE PRIVATNO UTOČIŠTE",
+    homeFeatureTitle: "Prostor za predah.",
+    homeFeatureText:
+      "Osjećajte se kao kod kuće, pronađite svoj omiljeni kutak i uživajte u boravku vlastitim tempom.",
+    homeGalleryLink: "ISTRAŽITE KUĆU",
+    homeNeighborhoodLink: "OTKRIJTE OKOLICU",
+    homeMapEyebrow: "KAKO DO NAS",
+    homeMapTitle: "Vaš smještaj, upravo ovdje.",
+    homeMapAddress: "Novakovščak 98",
+    homeMapLink: "OTVORI U GOOGLE MAPS-U",
+    amenitiesEyebrow: "KUĆA UKRATKO",
+    amenitiesTitle: "Dom s prostorom za šestero.",
+    amenitiesIntro: "Kamena kuća okružena prirodom, pažljivo opremljena za opušten obiteljski odmor.",
+    guestCapacity: "GOSTIJU",
+    propertyFacts: "O kući",
+    roomsAndBeds: "Sobe i ležajevi",
+    kitchenAndLaundry: "Kuhinja i praonica",
+    comfortAndEntertainment: "Udobnost i zabava",
+    gardenAndPool: "Vrt i bazen",
+    nearbyTitle: "Blizu prirode. Blizu svega.",
+    nearbyIntro: "Mirna lokacija uz šumu, s idealnim mogućnostima za šetnje, izlete i svakodnevne potrebe.",
+    nearbyNature: "Priroda i boravak na otvorenom",
+    nearbyActivities: "Aktivnosti i rekreacija",
+    nearbyEssentials: "Svakodnevne potrepštine",
+    nearbyTravel: "U okolici",
+    distanceLabel: "UDALJENOST",
+  },
 };
 
 type Copy = (typeof copy)[Language];
+
+const normalizeAvailabilityPayload = (payload: unknown): AvailabilityRange[] => {
+  if (!payload || typeof payload !== "object") {
+    throw new Error("Availability response has an unexpected format");
+  }
+
+  if ("availableRanges" in payload && Array.isArray(payload.availableRanges)) {
+    const ranges = payload.availableRanges;
+    if (
+      !ranges.every(
+        (range) =>
+          !!range &&
+          typeof range === "object" &&
+          "from" in range &&
+          "to" in range &&
+          typeof range.from === "string" &&
+          typeof range.to === "string" &&
+          /^\d{4}-\d{2}-\d{2}$/.test(range.from) &&
+          /^\d{4}-\d{2}-\d{2}$/.test(range.to) &&
+          range.from <= range.to,
+      )
+    ) {
+      throw new Error("Availability response has invalid date ranges");
+    }
+    return ranges;
+  }
+
+  if ("datesRanges" in payload && Array.isArray(payload.datesRanges)) {
+    const ranges = payload.datesRanges;
+    if (
+      !ranges.every(
+        (range) =>
+          !!range &&
+          typeof range === "object" &&
+          "from" in range &&
+          "to" in range &&
+          typeof range.from === "string" &&
+          typeof range.to === "string" &&
+          /^\d{8}$/.test(range.from) &&
+          /^\d{8}$/.test(range.to) &&
+          range.from <= range.to,
+      )
+    ) {
+      throw new Error("NOVASOL response has invalid date ranges");
+    }
+
+    const sortedRanges = ranges
+      .map((range) => ({
+        from: `${range.from.slice(0, 4)}-${range.from.slice(4, 6)}-${range.from.slice(6, 8)}`,
+        to: `${range.to.slice(0, 4)}-${range.to.slice(4, 6)}-${range.to.slice(6, 8)}`,
+      }))
+      .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to));
+    const mergedRanges: AvailabilityRange[] = [];
+
+    for (const range of sortedRanges) {
+      const lastRange = mergedRanges.at(-1);
+      if (lastRange && range.from <= lastRange.to) {
+        if (range.to > lastRange.to) lastRange.to = range.to;
+      } else {
+        mergedRanges.push(range);
+      }
+    }
+
+    return mergedRanges;
+  }
+
+  throw new Error("Availability response does not contain date ranges");
+};
 
 function AvailabilityCalendar({
   language,
   labels,
 }: {
   language: Language;
-  labels: Pick<Copy, "availabilityOpen" | "availabilityClosed">;
+  labels: Pick<
+    Copy,
+    | "availabilityOpen"
+    | "availabilityClosed"
+    | "availabilityLoading"
+    | "availabilityError"
+  >;
 }) {
+  const [availableRanges, setAvailableRanges] = useState<AvailabilityRange[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+  const [availabilityError, setAvailabilityError] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
-  const locale = language === "en" ? "en-GB" : "de-DE";
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadAvailability = async () => {
+      try {
+        const availabilityEndpoint = import.meta.env.DEV
+          ? "/api/novasol-availability"
+          : "/.netlify/functions/novasol-availability";
+        const response = await fetch(availabilityEndpoint, {
+          signal: controller.signal,
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error(`Availability request failed with HTTP ${response.status}`);
+        }
+
+        const payload: unknown = await response.json();
+        setAvailableRanges(normalizeAvailabilityPayload(payload));
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Could not load live NOVASOL availability:", error);
+        setAvailabilityError(true);
+      } finally {
+        if (!controller.signal.aborted) setAvailabilityLoading(false);
+      }
+    };
+
+    void loadAvailability();
+    return () => controller.abort();
+  }, []);
+
+  const locale = language === "en" ? "en-GB" : language === "de" ? "de-DE" : "hr-HR";
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const firstWeekday = (date: Date) => (date.getDay() + 6) % 7;
@@ -502,14 +770,26 @@ function AvailabilityCalendar({
       <div className="availability-calendar-header">
         <div>
           <span className="amenity-index">
-            {language === "en" ? "BOOKING CALENDAR" : "BELEGUNGSKALENDER"}
+            {language === "en"
+              ? "BOOKING CALENDAR"
+              : language === "de"
+                ? "BELEGUNGSKALENDER"
+                : "KALENDAR DOSTUPNOSTI"}
           </span>
-          <h2>{language === "en" ? "Find your moment." : "Finden Sie Ihren Moment."}</h2>
+          <h2>
+            {language === "en"
+              ? "Find your moment."
+              : language === "de"
+                ? "Finden Sie Ihren Moment."
+                : "Pronađite svoj trenutak."}
+          </h2>
         </div>
         <div className="availability-calendar-controls">
           <button
             type="button"
-            aria-label={language === "en" ? "Previous month" : "Vorheriger Monat"}
+            aria-label={
+              language === "en" ? "Previous month" : language === "de" ? "Vorheriger Monat" : "Prethodni mjesec"
+            }
             disabled={
               visibleMonth.getFullYear() === today.getFullYear() &&
               visibleMonth.getMonth() === today.getMonth()
@@ -520,7 +800,9 @@ function AvailabilityCalendar({
           </button>
           <button
             type="button"
-            aria-label={language === "en" ? "Next month" : "Nächster Monat"}
+            aria-label={
+              language === "en" ? "Next month" : language === "de" ? "Nächster Monat" : "Sljedeći mjesec"
+            }
             onClick={() => shiftMonth(1)}
           >
             <ChevronRight size={18} />
@@ -557,18 +839,24 @@ function AvailabilityCalendar({
                     String(monthNumber + 1).padStart(2, "0"),
                     String(day).padStart(2, "0"),
                   ].join("-");
-                  const isClosed = closedDateRanges.some(
-                    (range) => dateKey >= range.start && dateKey <= range.end,
-                  );
+                  const inKnownPeriod = availableRanges.length > 0 &&
+                    dateKey >= availableRanges[0].from &&
+                    dateKey <= availableRanges[availableRanges.length - 1].to;
+                  const isAvailable = !availabilityLoading &&
+                    !availabilityError &&
+                    inKnownPeriod &&
+                    availableRanges.some((range) => dateKey >= range.from && dateKey <= range.to);
+                  const isUnknown = availabilityLoading || availabilityError || !inKnownPeriod;
                   const isPast = date < today;
-                  const status = isClosed ? labels.availabilityClosed : labels.availabilityOpen;
+                  const status = isAvailable ? labels.availabilityOpen : labels.availabilityClosed;
+                  const statusClass = isAvailable ? "open" : isUnknown ? "unknown" : "closed";
 
                   return (
                     <span
                       aria-label={`${new Intl.DateTimeFormat(locale, {
                         dateStyle: "long",
                       }).format(date)}: ${status}`}
-                      className={`availability-day availability-day-${isClosed ? "closed" : "open"}${isPast ? " availability-day-past" : ""}`}
+                      className={`availability-day availability-day-${statusClass}${isPast ? " availability-day-past" : ""}`}
                       key={dateKey}
                       title={`${day}: ${status}`}
                     >
@@ -587,11 +875,9 @@ function AvailabilityCalendar({
           <span><i className="availability-legend-open" />{labels.availabilityOpen}</span>
           <span><i className="availability-legend-closed" />{labels.availabilityClosed}</span>
         </div>
-        <p>
-          {language === "en"
-            ? "Dates are indicative. Contact us to confirm your stay."
-            : "Die Termine dienen zur Orientierung. Bitte kontaktieren Sie uns zur Bestätigung."}
-        </p>
+        {(availabilityLoading || availabilityError) && (
+          <p>{availabilityLoading ? labels.availabilityLoading : labels.availabilityError}</p>
+        )}
       </div>
     </div>
   );
@@ -602,7 +888,7 @@ const amenityGroups: {
   items: Record<Language, string[]>;
 }[] = [
   {
-    title: { en: copy.en.propertyFacts, de: copy.de.propertyFacts },
+    title: { en: copy.en.propertyFacts, de: copy.de.propertyFacts, hr: copy.hr.propertyFacts },
     items: {
       en: [
         "Stone-built holiday home; built in 1992, renovated in 2024",
@@ -624,10 +910,20 @@ const amenityGroups: {
         "Kinderbetten: 0 · kostenlose Aufenthalte für Kinder unter 4: 0",
         "Babybett: 1 · Hochstuhl: 1",
       ],
+      hr: [
+        "Kamena kuća za odmor; izgrađena 1992., renovirana 2024.",
+        "Kategorija kvalitete: 4",
+        "Namijenjena samo za odmor; grupe mladih nisu dopuštene",
+        "U blizini šume",
+        "Kućni ljubimci nisu dopušteni",
+        "Za najviše 6 gostiju (4 + 2)",
+        "Dječji kreveti: 0 · besplatan boravak djece mlađe od 4 godine: 0",
+        "Dječji krevetić: 1 · hranilica: 1",
+      ],
     },
   },
   {
-    title: { en: copy.en.roomsAndBeds, de: copy.de.roomsAndBeds },
+    title: { en: copy.en.roomsAndBeds, de: copy.de.roomsAndBeds, hr: copy.hr.roomsAndBeds },
     items: {
       en: [
         "Living room: sofa bed for 2",
@@ -641,10 +937,16 @@ const amenityGroups: {
         "Schlafzimmer 2: Einzelbett, Kapazität 2",
         "2 Badezimmer, jeweils mit Dusche sowie Warm- und Kaltwasser",
       ],
+      hr: [
+        "Dnevni boravak: kauč na razvlačenje za 2 osobe",
+        "Spavaća soba 1: bračni krevet za 2 osobe",
+        "Spavaća soba 2: krevet za 2 osobe",
+        "2 kupaonice, svaka s tušem te toplom i hladnom vodom",
+      ],
     },
   },
   {
-    title: { en: copy.en.kitchenAndLaundry, de: copy.de.kitchenAndLaundry },
+    title: { en: copy.en.kitchenAndLaundry, de: copy.de.kitchenAndLaundry, hr: copy.hr.kitchenAndLaundry },
     items: {
       en: [
         "Kitchen and dining area; hot & cold water",
@@ -662,10 +964,18 @@ const amenityGroups: {
         "Waschmaschine, Trockner, Staubsauger",
         "Haartrockner, Bügeleisen, Kleiderbügel",
       ],
+      hr: [
+        "Kuhinja i blagovaonica; topla i hladna voda",
+        "Indukcijska ploča s 4 zone, pećnica i napa",
+        "Hladnjak sa zamrzivačem od 80 l, mikrovalna pećnica",
+        "Aparat za kavu, perilica posuđa, posuđe i pribor za jelo",
+        "Perilica i sušilica rublja, usisavač",
+        "Sušilo za kosu, glačalo i vješalice",
+      ],
     },
   },
   {
-    title: { en: copy.en.comfortAndEntertainment, de: copy.de.comfortAndEntertainment },
+    title: { en: copy.en.comfortAndEntertainment, de: copy.de.comfortAndEntertainment, hr: copy.hr.comfortAndEntertainment },
     items: {
       en: [
         "3 TVs, Smart TV, Netflix and stereo system",
@@ -685,10 +995,19 @@ const amenityGroups: {
         "3 Klimaanlagen (Heizen & Kühlen)",
         "Rauchmelder",
       ],
+      hr: [
+        "3 televizora, Smart TV, Netflix i stereo sustav",
+        "PlayStation 5, stolni tenis i društvene igre",
+        "Igračke za unutarnji i vanjski prostor; dječje knjige",
+        "Besplatan Wi-Fi",
+        "Centralno grijanje i potpuna toplinska izolacija",
+        "3 klima-uređaja za grijanje i hlađenje",
+        "Detektor dima",
+      ],
     },
   },
   {
-    title: { en: copy.en.gardenAndPool, de: copy.de.gardenAndPool },
+    title: { en: copy.en.gardenAndPool, de: copy.de.gardenAndPool, hr: copy.hr.gardenAndPool },
     items: {
       en: [
         "Private heated outdoor pool (20 m²), open June–September",
@@ -712,6 +1031,17 @@ const amenityGroups: {
         "Kostenloser Parkplatz für 2 Autos auf dem Grundstück",
         "Whirlpool und Sauna",
       ],
+      hr: [
+        "Privatni grijani vanjski bazen (20 m²), otvoren od lipnja do rujna",
+        "Vanjski tuš",
+        "Prirodno zemljište/vrt od 1.500 m², nije ograđeno",
+        "Natkrivena terasa i balkon",
+        "Vrtni namještaj i 4 ležaljke",
+        "Zidani roštilj i električni grill",
+        "Igračke i igre za vanjski prostor",
+        "Besplatno parkiralište za 2 automobila u sklopu objekta",
+        "Hidromasažna kada i sauna",
+      ],
     },
   },
 ];
@@ -721,45 +1051,45 @@ const nearbyGroups: {
   places: { name: Record<Language, string>; distance: string }[];
 }[] = [
   {
-    title: { en: copy.en.nearbyNature, de: copy.de.nearbyNature },
+    title: { en: copy.en.nearbyNature, de: copy.de.nearbyNature, hr: copy.hr.nearbyNature },
     places: [
-      { name: { en: "Walking trails", de: "Wanderwege" }, distance: "10 m" },
-      { name: { en: "Marked hiking trails (5–10 km)", de: "Markierte Wanderwege (5–10 km)" }, distance: "10 m" },
-      { name: { en: "Mountain bike trails (5–10 km)", de: "Mountainbike-Strecken (5–10 km)" }, distance: "10 m" },
-      { name: { en: "Cycling routes (5–10 km)", de: "Radwege (5–10 km)" }, distance: "10 m" },
-      { name: { en: "Lake / swimming area", de: "See / Badebereich" }, distance: "10 km" },
-      { name: { en: "Fishing", de: "Angeln" }, distance: "10 km" },
+      { name: { en: "Walking trails", de: "Wanderwege", hr: "Staze za šetnju" }, distance: "10 m" },
+      { name: { en: "Marked hiking trails (5–10 km)", de: "Markierte Wanderwege (5–10 km)", hr: "Označene pješačke staze (5–10 km)" }, distance: "10 m" },
+      { name: { en: "Mountain bike trails (5–10 km)", de: "Mountainbike-Strecken (5–10 km)", hr: "Staze za brdski biciklizam (5–10 km)" }, distance: "10 m" },
+      { name: { en: "Cycling routes (5–10 km)", de: "Radwege (5–10 km)", hr: "Biciklističke staze (5–10 km)" }, distance: "10 m" },
+      { name: { en: "Lake / swimming area", de: "See / Badebereich", hr: "Jezero / kupalište" }, distance: "10 km" },
+      { name: { en: "Fishing", de: "Angeln", hr: "Ribolov" }, distance: "10 km" },
     ],
   },
   {
-    title: { en: copy.en.nearbyActivities, de: copy.de.nearbyActivities },
+    title: { en: copy.en.nearbyActivities, de: copy.de.nearbyActivities, hr: copy.hr.nearbyActivities },
     places: [
-      { name: { en: "Tennis courts", de: "Tennisplätze" }, distance: "2.5 km" },
-      { name: { en: "Children’s playground", de: "Kinderspielplatz" }, distance: "2 km" },
-      { name: { en: "Public swimming pool", de: "Öffentliches Schwimmbad" }, distance: "8 km" },
-      { name: { en: "Outdoor swimming pool", de: "Freibad" }, distance: "8 km" },
-      { name: { en: "Water park", de: "Wasserpark" }, distance: "8 km" },
-      { name: { en: "Bowling", de: "Bowling" }, distance: "11 km" },
-      { name: { en: "Bicycle rental", de: "Fahrradverleih" }, distance: "18 km" },
-      { name: { en: "Recreation centre", de: "Freizeitzentrum" }, distance: "18 km" },
-      { name: { en: "Fitness centre", de: "Fitnessstudio" }, distance: "18 km" },
-      { name: { en: "Running / fitness trail", de: "Lauf- / Trimmpfad" }, distance: "18 km" },
-      { name: { en: "Thermal baths", de: "Therme" }, distance: "8 km" },
+      { name: { en: "Tennis courts", de: "Tennisplätze", hr: "Teniski tereni" }, distance: "2,5 km" },
+      { name: { en: "Children’s playground", de: "Kinderspielplatz", hr: "Dječje igralište" }, distance: "2 km" },
+      { name: { en: "Public swimming pool", de: "Öffentliches Schwimmbad", hr: "Javni bazen" }, distance: "8 km" },
+      { name: { en: "Outdoor swimming pool", de: "Freibad", hr: "Vanjski bazen" }, distance: "8 km" },
+      { name: { en: "Water park", de: "Wasserpark", hr: "Aquapark" }, distance: "8 km" },
+      { name: { en: "Bowling", de: "Bowling", hr: "Kuglana" }, distance: "11 km" },
+      { name: { en: "Bicycle rental", de: "Fahrradverleih", hr: "Najam bicikala" }, distance: "18 km" },
+      { name: { en: "Recreation centre", de: "Freizeitzentrum", hr: "Rekreacijski centar" }, distance: "18 km" },
+      { name: { en: "Fitness centre", de: "Fitnessstudio", hr: "Fitness centar" }, distance: "18 km" },
+      { name: { en: "Running / fitness trail", de: "Lauf- / Trimmpfad", hr: "Staza za trčanje / trim-staza" }, distance: "18 km" },
+      { name: { en: "Thermal baths", de: "Therme", hr: "Terme" }, distance: "8 km" },
     ],
   },
   {
-    title: { en: copy.en.nearbyEssentials, de: copy.de.nearbyEssentials },
+    title: { en: copy.en.nearbyEssentials, de: copy.de.nearbyEssentials, hr: copy.hr.nearbyEssentials },
     places: [
-      { name: { en: "Grocery shop", de: "Geschäft" }, distance: "2 km" },
-      { name: { en: "Restaurant", de: "Restaurant" }, distance: "2.5 km" },
-      { name: { en: "Nearest neighbour", de: "Nächster Nachbar" }, distance: "50 m" },
+      { name: { en: "Grocery shop", de: "Geschäft", hr: "Trgovina" }, distance: "2 km" },
+      { name: { en: "Restaurant", de: "Restaurant", hr: "Restoran" }, distance: "2,5 km" },
+      { name: { en: "Nearest neighbour", de: "Nächster Nachbar", hr: "Najbliži susjed" }, distance: "50 m" },
     ],
   },
   {
-    title: { en: copy.en.nearbyTravel, de: copy.de.nearbyTravel },
+    title: { en: copy.en.nearbyTravel, de: copy.de.nearbyTravel, hr: copy.hr.nearbyTravel },
     places: [
-      { name: { en: "Varaždin city centre", de: "Stadtzentrum Varaždin" }, distance: "18 km" },
-      { name: { en: "Zagreb Airport (ZAG)", de: "Flughafen Zagreb (ZAG)" }, distance: "77 km" },
+      { name: { en: "Varaždin city centre", de: "Stadtzentrum Varaždin", hr: "Središte Varaždina" }, distance: "18 km" },
+      { name: { en: "Zagreb Airport (ZAG)", de: "Flughafen Zagreb (ZAG)", hr: "Zračna luka Zagreb (ZAG)" }, distance: "77 km" },
     ],
   },
 ];
@@ -812,7 +1142,7 @@ function NeighborhoodPage({
           ))}
         </div>
         <span className="result-count">
-          {String(filteredPlaces.length).padStart(2, "0")} PLACES
+          {String(filteredPlaces.length).padStart(2, "0")} {t.placesCount}
         </span>
       </div>
 
@@ -841,7 +1171,7 @@ function NeighborhoodPage({
             </button>
             <div className="place-meta">
               <span className="place-category">
-                {place.category === "restaurant" ? "DINING" : "SHOPPING"}
+                {place.category === "restaurant" ? t.dining : t.shopping}
               </span>
               <span className="place-distance">
                 <MapPin size={12} />
@@ -864,7 +1194,7 @@ function NeighborhoodPage({
 }
 
 function App() {
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useState<Language>("hr");
   const [category, setCategory] = useState<Category>("all");
   const [selected, setSelected] = useState<Place | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -882,6 +1212,10 @@ function App() {
     imageIndex: number;
   } | null>(null);
   const t = copy[language];
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const filteredPlaces = places.filter(
     (place) => category === "all" || place.category === category,
@@ -1042,6 +1376,13 @@ function App() {
         <div className="nav-right">
           <Globe2 size={16} strokeWidth={1.5} />
           <button
+            className={language === "hr" ? "language active-language" : "language"}
+            onClick={() => setLanguage("hr")}
+          >
+            HR
+          </button>
+          <span className="language-divider">/</span>
+          <button
             className={language === "en" ? "language active-language" : "language"}
             onClick={() => setLanguage("en")}
           >
@@ -1056,7 +1397,7 @@ function App() {
           </button>
           <button
             className="menu-button"
-            aria-label="Toggle navigation"
+            aria-label={t.menuToggle}
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <X size={21} /> : <Menu size={21} />}
@@ -1113,7 +1454,7 @@ function App() {
                         aria-label={`${section.title[language]} ${imageIndex + 1}`}
                         style={{ animationDelay: `${Math.min(imageIndex, 5) * 70}ms` }}
                       >
-                        <img src={image.src} alt={image.alt} loading="lazy" />
+                        <img src={image.src} alt={`${section.title[language]} ${imageIndex + 1}`} loading="lazy" />
                         <span className="gallery-image-overlay">
                           <span>{section.title[language]}</span>
                           <span>0{imageIndex + 1}</span>
@@ -1144,8 +1485,7 @@ function App() {
           </header>
           <div className="availability-content">
             <AvailabilityCalendar language={language} labels={t} />
-            <div className="availability-manual-note">
-              <p>{t.availabilityManualNote}</p>
+            <div className="availability-source-note">
               <span>{t.availabilityNote}</span>
               <a href="mailto:kucajozic1@gmail.com?subject=Availability%20inquiry">
                 {t.availabilityContact}
@@ -1233,11 +1573,11 @@ function App() {
           <section className="quote-section reveal">
             <div className="quote-decoration">“</div>
             <p>
-              The best memories are made
+              {t.quoteFirst}
               <br />
-              <em>when you have time to enjoy them.</em>
+              <em>{t.quoteSecond}</em>
             </p>
-            <span className="quote-caption">A LITTLE MORE TIME. A LITTLE MORE LIFE.</span>
+            <span className="quote-caption">{t.quoteCaption}</span>
           </section>
         </>
       ) : <>
@@ -1273,7 +1613,7 @@ function App() {
           <span className="hero-scroll">
             {t.scroll} <span className="scroll-line" />
           </span>
-          <span>VARAŽDIN COUNTY · CROATIA</span>
+          <span>{t.county}</span>
         </div>
         <div className="hero-index">01 <span>/ 03</span></div>
       </section>
@@ -1293,14 +1633,14 @@ function App() {
             <p>{t.subtitle}</p>
             <div className="intro-signature">
               <span className="signature-line" />
-              <span>Jožić family</span>
+              <span>{t.family}</span>
             </div>
           </div>
         </div>
         <div className="intro-rule">
           <span>01</span>
           <span>{t.count}</span>
-          <span>CURATED WITH CARE</span>
+          <span>{t.curatedWithCare}</span>
         </div>
       </section>
 
@@ -1347,6 +1687,56 @@ function App() {
           <button className="home-text-link" onClick={navigateToNeighborhood}>
             {t.homeNeighborhoodLink} <ArrowUpRight size={16} />
           </button>
+        </div>
+      </section>
+
+      <section className="home-map-section reveal">
+        <div className="home-map-heading">
+          <div>
+            <span className="eyebrow dark-eyebrow">
+              <span className="eyebrow-line" />
+              {t.homeMapEyebrow}
+            </span>
+            <h2>{t.homeMapTitle}</h2>
+          </div>
+          <a
+            className="home-map-link"
+            href="https://www.google.com/maps/search/?api=1&query=Novakov%C5%A1%C4%8Dak+98"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <MapPin size={16} />
+            {t.homeMapLink}
+            <ArrowUpRight size={15} />
+          </a>
+        </div>
+        <div className="home-map-frame">
+          <MapContainer
+            center={[46.2433, 16.4944]}
+            zoom={11}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker
+              position={[46.2433, 16.4944]}
+              icon={divIcon({
+                className: "home-map-marker",
+                html: '<span class="home-map-pin"></span>',
+                iconSize: [24, 34],
+                iconAnchor: [12, 34],
+              })}
+            >
+              <Popup>{t.homeMapAddress}</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+        <div className="home-map-caption">
+          <MapPin size={16} />
+          <strong>{t.homeMapAddress}</strong>
+          <span>{t.county}</span>
         </div>
       </section>
 
@@ -1416,11 +1806,11 @@ function App() {
       <section className="quote-section reveal">
         <div className="quote-decoration">“</div>
         <p>
-          The best memories are made
+          {t.quoteFirst}
           <br />
-          <em>when you have time to enjoy them.</em>
+          <em>{t.quoteSecond}</em>
         </p>
-        <span className="quote-caption">A LITTLE MORE TIME. A LITTLE MORE LIFE.</span>
+        <span className="quote-caption">{t.quoteCaption}</span>
       </section>
       </>}
 
@@ -1447,7 +1837,7 @@ function App() {
             }
           }}
         >
-          BACK TO TOP <ArrowUpRight size={15} />
+          {t.backToTop} <ArrowUpRight size={15} />
         </a>
       </footer>
 
@@ -1462,7 +1852,7 @@ function App() {
           </button>
           <button
             className="gallery-lightbox-arrow gallery-lightbox-prev"
-            aria-label="Previous photo"
+            aria-label={t.previousPhoto}
             onClick={(event) => {
               event.stopPropagation();
               moveGalleryImage(-1);
@@ -1477,7 +1867,7 @@ function App() {
           />
           <button
             className="gallery-lightbox-arrow gallery-lightbox-next"
-            aria-label="Next photo"
+            aria-label={t.nextPhoto}
             onClick={(event) => {
               event.stopPropagation();
               moveGalleryImage(1);
@@ -1505,15 +1895,15 @@ function App() {
           >
             <div className="modal-image-wrap">
               <img src={selected.image} alt={selected.name} className="modal-image" />
-              <button className="modal-close" onClick={() => setSelected(null)} aria-label="Close">
+              <button className="modal-close" onClick={() => setSelected(null)} aria-label={t.close}>
                 <X size={21} />
               </button>
-              <span className="modal-image-label">THE LOCAL EDIT · 0{selected.id}</span>
+              <span className="modal-image-label">{t.modalImageLabel} · 0{selected.id}</span>
             </div>
             <div className="modal-content">
               <div className="eyebrow dark-eyebrow">
                 <span className="eyebrow-line" />
-                {selected.category === "restaurant" ? "FOOD & DRINK" : "SHOPPING"}
+                {selected.category === "restaurant" ? t.dining : t.shopping}
               </div>
               <h2>{selected.name}</h2>
               <p className="modal-description">{selected.description[language]}</p>
@@ -1528,7 +1918,7 @@ function App() {
                 </div>
                 {selected.phone && (
                   <div>
-                    <span className="info-label">PHONE</span>
+                    <span className="info-label">{t.contactPhone}</span>
                     <strong><Phone size={15} /> {selected.phone}</strong>
                   </div>
                 )}

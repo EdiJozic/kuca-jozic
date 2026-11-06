@@ -3018,7 +3018,15 @@ body {
   border-radius: 50%;
   color: #554c40;
   font-size: 11px;
-  transition: background 160ms ease, color 160ms ease;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.availability-day-open {
+  border: 1px solid #a67c4f;
+}
+
+.availability-day-open.availability-day-past {
+  border-color: #d7cbbc;
 }
 
 .availability-day-open:not(.availability-day-past):hover {
@@ -3029,6 +3037,11 @@ body {
   background: #a76f5b;
   color: #fffaf2;
   text-decoration: line-through;
+}
+
+.availability-day-unknown {
+  border: 1px dashed #c9bba7;
+  color: #82796d;
 }
 
 .availability-day-past {
@@ -3065,7 +3078,7 @@ body {
 }
 
 .availability-legend-open {
-  border: 1px solid #c9bba7;
+  border: 1px solid #a67c4f;
 }
 
 .availability-legend-closed {
@@ -3081,7 +3094,7 @@ body {
   text-align: right;
 }
 
-.availability-manual-note {
+.availability-source-note {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -3092,7 +3105,7 @@ body {
   background: rgb(251 249 244 / 65%);
 }
 
-.availability-manual-note p {
+.availability-source-note p {
   grid-column: 1;
   margin: 0;
   color: #756d62;
@@ -3100,13 +3113,13 @@ body {
   line-height: 1.8;
 }
 
-.availability-manual-note > span {
+.availability-source-note > span {
   grid-column: 1;
   color: #9a8d7d;
   font-size: 10px;
 }
 
-.availability-manual-note a {
+.availability-source-note a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -3116,11 +3129,11 @@ body {
   letter-spacing: 0.8px;
 }
 
-.availability-manual-note a svg {
+.availability-source-note a svg {
   transition: transform 180ms ease;
 }
 
-.availability-manual-note a:hover svg {
+.availability-source-note a:hover svg {
   transform: translate(2px, -2px);
 }
 
@@ -3238,13 +3251,13 @@ body {
     text-align: left;
   }
 
-  .availability-manual-note {
+  .availability-source-note {
     grid-template-columns: minmax(0, 1fr);
     padding: 19px;
   }
 
-  .availability-manual-note p,
-  .availability-manual-note > span {
+  .availability-source-note p,
+  .availability-source-note > span {
     grid-column: 1;
   }
 
@@ -3362,5 +3375,137 @@ body {
 
   .amenities-grid {
     column-count: 1;
+  }
+}
+
+.home-map-section {
+  padding: 90px 7.1% 96px;
+  background: #f4f0e8;
+}
+
+.home-map-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 0 auto 28px;
+}
+
+.home-map-heading h2 {
+  margin: 0;
+  color: #332d26;
+  font: 400 clamp(36px, 4.2vw, 56px)/1.15 var(--serif);
+}
+
+.home-map-link {
+  display: inline-flex;
+  min-height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid #a67c4f;
+  color: #684a2c;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.home-map-link:hover {
+  background: #8d673f;
+  color: #fffaf2;
+}
+
+.home-map-frame {
+  height: clamp(300px, 40vw, 500px);
+  overflow: hidden;
+  border: 1px solid #cfc3b2;
+  background: #e6dfd3;
+  box-shadow: 0 18px 50px rgb(52 39 25 / 12%);
+}
+
+.home-map-frame .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #e6dfd3;
+}
+
+.home-map-marker {
+  border: 0;
+  background: transparent;
+}
+
+.home-map-pin {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: #d52828;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 40%);
+  transform: rotate(-45deg);
+}
+
+.home-map-pin::after {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+}
+
+.home-map-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  color: #805b34;
+}
+
+.home-map-caption strong {
+  color: #332d26;
+  font-size: 12px;
+}
+
+.home-map-caption span {
+  margin-left: auto;
+  color: #756d62;
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .home-map-section {
+    padding: 68px 22px 74px;
+  }
+
+  .home-map-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .home-map-heading h2 {
+    font-size: clamp(35px, 9vw, 48px);
+  }
+
+  .home-map-frame {
+    height: 340px;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-map-caption {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .home-map-caption span {
+    width: 100%;
+    margin-left: 26px;
   }
 }

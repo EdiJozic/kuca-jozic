@@ -1,5 +1,14 @@
 # React + TypeScript + Vite
 
+## NOVASOL availability
+
+The availability calendar loads dates for property `CCC667` through the Netlify
+Function at `/.netlify/functions/novasol-availability`. Responses are cached for
+five minutes. The function uses NOVASOL's public but undocumented availability
+endpoint, which NOVASOL may change. `npm run dev` proxies the endpoint during
+local development; `netlify dev` can also be used to run the Netlify Function
+locally.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
