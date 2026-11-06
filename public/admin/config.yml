@@ -1,0 +1,127 @@
+backend:
+  name: github
+  repo: EdiJozic/kuca-jozic
+  branch: main
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+locale: hr
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: site_content
+    label: Sadržaj web-stranice
+    files:
+      - name: preporuke
+        label: Preporuke i mjesta
+        file: public/data/places.json
+        fields:
+          - name: places
+            label: Mjesta
+            widget: list
+            fields:
+              - { name: id, label: ID, widget: number, value_type: int }
+              - { name: name, label: Naziv, widget: string }
+              - name: category
+                label: Kategorija
+                widget: select
+                options: [restaurant, shop]
+              - { name: distance, label: Udaljenost, widget: string }
+              - { name: image, label: Fotografija, widget: image }
+              - name: description
+                label: Opis
+                widget: object
+                fields:
+                  - { name: en, label: Engleski, widget: text }
+                  - { name: de, label: Njemački, widget: text }
+                  - { name: hr, label: Hrvatski, widget: text }
+              - name: tip
+                label: Savjet domaćina
+                widget: object
+                fields:
+                  - { name: en, label: Engleski, widget: text }
+                  - { name: de, label: Njemački, widget: text }
+                  - { name: hr, label: Hrvatski, widget: text }
+              - { name: address, label: Adresa, widget: string, required: false }
+              - { name: phone, label: Telefon, widget: string, required: false }
+              - { name: maps, label: Google Maps poveznica, widget: string }
+              - { name: lat, label: Geografska širina, widget: number, value_type: float, required: false }
+              - { name: lng, label: Geografska dužina, widget: number, value_type: float, required: false }
+              - { name: visible, label: Vidljivo, widget: boolean, default: true }
+      - name: informacije
+        label: Informacije o kući
+        file: public/data/info.json
+        fields:
+          - { name: wifiName, label: Naziv Wi-Fi mreže, widget: string, required: false }
+          - { name: wifiPassword, label: Wi-Fi lozinka, widget: string, required: false }
+          - { name: checkIn, label: Prijava od, widget: string, required: false }
+          - { name: checkOut, label: Odjava do, widget: string, required: false }
+          - name: entryInstructions
+            label: Upute za ulaz
+            widget: object
+            fields:
+              - { name: en, label: Engleski, widget: text }
+              - { name: de, label: Njemački, widget: text }
+              - { name: hr, label: Hrvatski, widget: text }
+          - name: houseRules
+            label: Kućni red
+            widget: object
+            fields:
+              - { name: en, label: Engleski, widget: text }
+              - { name: de, label: Njemački, widget: text }
+              - { name: hr, label: Hrvatski, widget: text }
+          - name: emergencyContacts
+            label: Hitni kontakti
+            widget: list
+            fields:
+              - { name: name, label: Naziv, widget: string }
+              - { name: phone, label: Telefon, widget: string }
+              - name: description
+                label: Napomena
+                widget: object
+                fields:
+                  - { name: en, label: Engleski, widget: text }
+                  - { name: de, label: Njemački, widget: text }
+                  - { name: hr, label: Hrvatski, widget: text }
+      - name: usluge
+        label: Cijene i dodatne usluge
+        file: public/data/services.json
+        fields:
+          - name: services
+            label: Usluge
+            widget: list
+            fields:
+              - { name: name, label: Naziv, widget: string }
+              - { name: price, label: Cijena, widget: string }
+              - name: description
+                label: Opis
+                widget: object
+                fields:
+                  - { name: en, label: Engleski, widget: text }
+                  - { name: de, label: Njemački, widget: text }
+                  - { name: hr, label: Hrvatski, widget: text }
+              - { name: available, label: Dostupno, widget: boolean, default: true }
+      - name: obavijesti
+        label: Obavijesti
+        file: public/data/notices.json
+        fields:
+          - name: notices
+            label: Obavijesti
+            widget: list
+            fields:
+              - { name: id, label: ID, widget: string }
+              - name: text
+                label: Tekst obavijesti
+                widget: object
+                fields:
+                  - { name: en, label: Engleski, widget: text }
+                  - { name: de, label: Njemački, widget: text }
+                  - { name: hr, label: Hrvatski, widget: text }
+              - name: type
+                label: Vrsta
+                widget: select
+                options: [info, warning, event]
+              - { name: from, label: Datum od, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+              - { name: to, label: Datum do, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+              - { name: active, label: Aktivna, widget: boolean, default: true }

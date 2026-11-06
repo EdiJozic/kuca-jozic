@@ -6,17 +6,20 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  CalendarDays,
   Camera,
   ChevronLeft,
   ChevronRight,
   Clock3,
   Globe2,
+  Info,
   Mail,
   MapPin,
   Menu,
   MessageCircle,
   Phone,
   ShoppingBasket,
+  TriangleAlert,
   Utensils,
   UsersRound,
   X,
@@ -39,6 +42,39 @@ type Place = {
   address: string;
   phone?: string;
   maps: string;
+  lat?: number;
+  lng?: number;
+  visible?: boolean;
+};
+
+type HouseInfo = {
+  wifiName: string;
+  wifiPassword: string;
+  checkIn: string;
+  checkOut: string;
+  entryInstructions: Record<Language, string>;
+  houseRules: Record<Language, string>;
+  emergencyContacts: {
+    name: string;
+    phone: string;
+    description: Record<Language, string>;
+  }[];
+};
+
+type Service = {
+  name: string;
+  price: string;
+  description: Record<Language, string>;
+  available: boolean;
+};
+
+type Notice = {
+  id: string;
+  text: Record<Language, string>;
+  type: "info" | "warning" | "event";
+  from: string;
+  to: string;
+  active: boolean;
 };
 
 type GalleryCategory = {
@@ -132,195 +168,6 @@ const gallery = galleryCategories.map((category) => ({
       alt: `${category.title.en} ${index + 1}`,
     })),
 }));
-
-const places: Place[] = [
-  {
-    id: 1,
-    name: "Zlatne Gorice",
-    category: "restaurant",
-    distance: "8 km",
-    image:
-      "https://www.zlatne-gorice.eu/assets/images/home-hero.jpg",
-    description: {
-      en: "Local flavours, thoughtful cooking and a beautiful countryside setting.",
-      de: "Regionale Aromen, sorgfältige Küche und eine wunderschöne ländliche Umgebung.",
-      hr: "Lokalni okusi, pažljivo pripremljena jela i prekrasno seosko okruženje.",
-    },
-    tip: {
-      en: "Ask about the local seasonal specialities.",
-      de: "Fragen Sie nach den saisonalen Spezialitäten der Region.",
-      hr: "Raspitajte se o lokalnim sezonskim specijalitetima.",
-    },
-    address: "Zlatne Gorice, Varaždin",
-    phone: "+385 42 123 456",
-    maps: "https://www.google.com/maps/search/?api=1&query=Zlatne+Gorice",
-  },
-  {
-    id: 2,
-    name: "Pizzeria Špan",
-    category: "restaurant",
-    distance: "6 km",
-    image:
-      "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1000&q=85",
-    description: {
-      en: "A relaxed local favourite for pizza, pasta and an easy-going evening.",
-      de: "Ein beliebter Ort für Pizza, Pasta und einen entspannten Abend.",
-      hr: "Omiljeno lokalno mjesto za pizzu, tjesteninu i opuštenu večer.",
-    },
-    tip: {
-      en: "A lovely choice for a casual family dinner.",
-      de: "Eine schöne Wahl für ein entspanntes Abendessen mit der Familie.",
-      hr: "Odličan izbor za opuštenu obiteljsku večeru.",
-    },
-    address: "Pizzeria Špan, Varaždin area",
-    phone: "+385 42 345 678",
-    maps: "https://www.google.com/maps/search/?api=1&query=Pizzeria+Span",
-  },
-  {
-    id: 3,
-    name: "Restaurant Bernarda",
-    category: "restaurant",
-    distance: "11 km",
-    image:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85",
-    description: {
-      en: "Traditional home-style cooking in a warm, welcoming atmosphere.",
-      de: "Traditionelle Hausmannskost in einer warmen, einladenden Atmosphäre.",
-      hr: "Tradicionalna domaća kuhinja u toplom i ugodnom ambijentu.",
-    },
-    tip: {
-      en: "Consider reserving a table on weekends.",
-      de: "Am Wochenende empfiehlt sich eine Tischreservierung.",
-      hr: "Vikendom preporučujemo rezervaciju stola.",
-    },
-    address: "Restaurant Bernarda",
-    phone: "+385 42 234 567",
-    maps: "https://www.google.com/maps/search/?api=1&query=Restaurant+Bernarda",
-  },
-  {
-    id: 4,
-    name: "KTC Jalžabet",
-    category: "shop",
-    distance: "3 km",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ9f8Wcv-ZGSZmv6Oy-LVOTvrF7ye6tdT0o6wu4t_QuEh4OvLAb-5PUnPi&s=10",
-    description: {
-      en: "Your nearby stop for groceries, fresh produce and everyday essentials.",
-      de: "Ihr Supermarkt in der Nähe für Lebensmittel und Dinge des täglichen Bedarfs.",
-      hr: "Trgovina u blizini za namirnice, svježe proizvode i svakodnevne potrepštine.",
-    },
-    tip: {
-      en: "A convenient option for stocking up after arrival.",
-      de: "Ideal, um sich nach der Ankunft mit allem Nötigen einzudecken.",
-      hr: "Praktično mjesto za nabavu nakon dolaska.",
-    },
-    address: "Jalžabet, Croatia",
-    phone: "+385 42 456 789",
-    maps: "https://www.google.com/maps/search/?api=1&query=KTC+Jalzabet",
-  },
-  {
-    id: 5,
-    name: "KFC Varaždin",
-    category: "restaurant",
-    distance: "13 km",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5AgrEcypvoW2hU8_D3gjC_gI__Of4OsdaKDbslCaWLhuXqajQvgNLKOn2&s=10",
-    description: {
-      en: "A familiar fast-food option when you want something quick and easy.",
-      de: "Eine bekannte Fast-Food-Option für eine schnelle und unkomplizierte Mahlzeit.",
-      hr: "Poznati fast-food izbor kada želite brz i jednostavan obrok.",
-    },
-    tip: {
-      en: "Useful for a quick meal while visiting Varaždin.",
-      de: "Praktisch für eine schnelle Mahlzeit bei einem Besuch in Varaždin.",
-      hr: "Dobro za brz obrok tijekom posjeta Varaždinu.",
-    },
-    address: "Varaždin, Croatia",
-    maps: "https://www.google.com/maps/search/?api=1&query=KFC+Varazdin",
-  },
-  {
-    id: 6,
-    name: "Lumini",
-    category: "shop",
-    distance: "14 km",
-    image:
-      "https://gipsmont-m.hr/wp-content/uploads/2020/11/Tvornica-zdrave-hrane-Biotrgovina-Lumini-centar-Varazdin-1.jpg",
-    description: {
-      en: "Shopping, dining and entertainment all in one place.",
-      de: "Shopping, Gastronomie und Unterhaltung an einem Ort.",
-      hr: "Kupovina, gastronomija i zabava na jednom mjestu.",
-    },
-    tip: {
-      en: "A good rainy-day option for the whole family.",
-      de: "Eine gute Idee für einen Regentag mit der ganzen Familie.",
-      hr: "Dobar izbor za kišni dan s cijelom obitelji.",
-    },
-    address: "Lumini Shopping Centre",
-    maps: "https://www.google.com/maps/search/?api=1&query=Lumini+Varazdin",
-  },
-  {
-    id: 7,
-    name: "Kaufland Varaždin",
-    category: "shop",
-    distance: "8 km",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/6/65/Kaufland_Deutschland.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
-    description: {
-      en: "A large supermarket with a wide range of groceries and essentials.",
-      de: "Ein großer Supermarkt mit einer breiten Auswahl an Lebensmitteln.",
-      hr: "Veliki supermarket s bogatom ponudom namirnica i potrepština.",
-    },
-    tip: {
-      en: "Convenient for a larger grocery shop.",
-      de: "Praktisch für einen größeren Einkauf.",
-      hr: "Praktično za veću kupovinu namirnica.",
-    },
-    address: "Koprivnička 17, Varaždin",
-    phone: "0800 223 223",
-    maps: "https://www.google.com/maps/search/?api=1&query=Kaufland+Varazdin",
-  },
-  {
-    id: 8,
-    name: "Plodine Ludbreg",
-    category: "shop",
-    distance: "15 km",
-    image:
-      "https://familymall.hr/wp-content/uploads/2021/04/Plodine-logo.png.webp",
-    description: {
-      en: "A practical supermarket for groceries and daily essentials.",
-      de: "Ein praktischer Supermarkt für Lebensmittel und Dinge des täglichen Bedarfs.",
-      hr: "Praktičan supermarket za namirnice i svakodnevne potrepštine.",
-    },
-    tip: {
-      en: "Combine your shopping with a visit to Ludbreg.",
-      de: "Verbinden Sie den Einkauf mit einem Besuch in Ludbreg.",
-      hr: "Spojite kupovinu s posjetom Ludbregu.",
-    },
-    address: "Ludbreg, Croatia",
-    phone: "+385 42 272 100",
-    maps: "https://www.google.com/maps/search/?api=1&query=Plodine+Ludbreg",
-  },
-  {
-    id: 9,
-    name: "STOP SHOP Ludbreg",
-    category: "shop",
-    distance: "15 km",
-    image:
-      "https://cdn-emedjimurje.net.hr/wp-content/uploads/a6cf90e7b2ff4107c8d104c7e93d034b.jpg",
-    description: {
-      en: "A retail park with several stores for fashion, home and everyday shopping.",
-      de: "Ein Einkaufspark mit Geschäften für Mode, Wohnen und den täglichen Bedarf.",
-      hr: "Trgovački park s trgovinama za modu, dom i svakodnevnu kupovinu.",
-    },
-    tip: {
-      en: "Several useful shops in one convenient stop.",
-      de: "Mehrere praktische Geschäfte an einem Ort.",
-      hr: "Više korisnih trgovina na jednome mjestu.",
-    },
-    address: "STOP SHOP Ludbreg",
-    maps: "https://www.google.com/maps/search/?api=1&query=STOP+SHOP+Ludbreg",
-  },
-];
 
 const copy = {
   en: {
@@ -1198,6 +1045,19 @@ function App() {
   const [category, setCategory] = useState<Category>("all");
   const [selected, setSelected] = useState<Place | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [houseInfo, setHouseInfo] = useState<HouseInfo | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [contentError, setContentError] = useState(false);
+  const [dismissedNoticeKeys, setDismissedNoticeKeys] = useState<string[]>(() => {
+    const storedNotices = window.localStorage.getItem("dismissed-notices");
+    if (!storedNotices) return [];
+    const parsed: unknown = JSON.parse(storedNotices);
+    return Array.isArray(parsed) && parsed.every((key) => typeof key === "string")
+      ? parsed
+      : [];
+  });
   const [currentPage, setCurrentPage] = useState(
     () => {
       if (window.location.hash === "#neighborhood" || window.location.hash === "#guide") return "neighborhood";
@@ -1214,12 +1074,102 @@ function App() {
   const t = copy[language];
 
   useEffect(() => {
+    const controller = new AbortController();
+    const loadContent = async () => {
+      try {
+        const paths = ["/data/places.json", "/data/info.json", "/data/services.json", "/data/notices.json"];
+        const responses = await Promise.all(
+          paths.map((path) => fetch(path, { signal: controller.signal })),
+        );
+        const failedResponse = responses.find((response) => !response.ok);
+        if (failedResponse) {
+          throw new Error(`Content request failed with HTTP ${failedResponse.status}`);
+        }
+
+        const [placesData, infoData, servicesData, noticesData] = await Promise.all(
+          responses.map((response) => response.json()),
+        );
+        if (
+          !Array.isArray(placesData.places) ||
+          !Array.isArray(servicesData.services) ||
+          !Array.isArray(noticesData.notices) ||
+          !infoData ||
+          typeof infoData !== "object"
+        ) {
+          throw new Error("Content files do not match the expected structure");
+        }
+
+        setPlaces(placesData.places as Place[]);
+        setHouseInfo(infoData as HouseInfo);
+        setServices(servicesData.services as Service[]);
+        setNotices(noticesData.notices as Notice[]);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Could not load editable website content:", error);
+        setContentError(true);
+      }
+    };
+
+    void loadContent();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
   const filteredPlaces = places.filter(
-    (place) => category === "all" || place.category === category,
+    (place) => place.visible !== false && (category === "all" || place.category === category),
   );
+
+  const today = new Date();
+  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const activeNotices = notices.filter(
+    (notice) => notice.active && notice.from.slice(0, 10) <= todayString && notice.to.slice(0, 10) >= todayString,
+  );
+  const visibleNotices = activeNotices
+    .map((notice) => ({
+      notice,
+      text: notice.text[language]?.trim() || "",
+      key: `${notice.id}:${JSON.stringify(notice.text)}`,
+    }))
+    .filter(({ text, key }) => text && !dismissedNoticeKeys.includes(key));
+  const infoLabels = {
+    en: {
+      title: "Guest information",
+      wifi: "Wi-Fi",
+      checkIn: "Check-in",
+      checkOut: "Check-out",
+      entry: "Entry instructions",
+      rules: "House rules",
+      emergency: "Emergency contacts",
+      services: "Prices & extra services",
+    },
+    de: {
+      title: "Informationen für Gäste",
+      wifi: "WLAN",
+      checkIn: "Check-in",
+      checkOut: "Check-out",
+      entry: "Zugangshinweise",
+      rules: "Hausordnung",
+      emergency: "Notfallkontakte",
+      services: "Preise & Zusatzleistungen",
+    },
+    hr: {
+      title: "Informacije za goste",
+      wifi: "Wi-Fi",
+      checkIn: "Prijava",
+      checkOut: "Odjava",
+      entry: "Upute za ulaz",
+      rules: "Kućni red",
+      emergency: "Hitni kontakti",
+      services: "Cijene i dodatne usluge",
+    },
+  }[language];
+  const availableServices = services.filter((service) => service.available);
+  const visibleEmergencyContacts = houseInfo?.emergencyContacts.filter(
+    (contact) => contact.name.trim() || contact.phone.trim(),
+  ) ?? [];
 
   const moveGalleryImage = useCallback((direction: number) => {
     setSelectedGalleryImage((current) => {
@@ -1301,8 +1251,51 @@ function App() {
     navigateTo("neighborhood");
   };
 
+  if (contentError || !houseInfo) {
+    return (
+      <main className="content-status" role="alert">
+        {contentError
+          ? language === "en"
+            ? "Website content could not be loaded. Please try again later."
+            : language === "de"
+              ? "Die Website-Inhalte konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+              : "Sadržaj stranice nije moguće učitati. Pokušajte ponovno kasnije."
+          : language === "en"
+            ? "Loading website content…"
+            : language === "de"
+              ? "Website-Inhalte werden geladen…"
+              : "Učitavanje sadržaja…"}
+      </main>
+    );
+  }
+
   return (
     <main>
+      {visibleNotices.map(({ notice, text, key }) => (
+        <aside className={`notice-banner notice-${notice.type}`} role="status" key={key}>
+          <span className="notice-icon" aria-hidden="true">
+            {notice.type === "warning" ? (
+              <TriangleAlert size={20} />
+            ) : notice.type === "event" ? (
+              <CalendarDays size={20} />
+            ) : (
+              <Info size={20} />
+            )}
+          </span>
+          <p>{text}</p>
+          <button
+            type="button"
+            aria-label={language === "en" ? "Dismiss notice" : language === "de" ? "Hinweis schließen" : "Zatvori obavijest"}
+            onClick={() => {
+              const nextDismissed = [...dismissedNoticeKeys, key];
+              setDismissedNoticeKeys(nextDismissed);
+              window.localStorage.setItem("dismissed-notices", JSON.stringify(nextDismissed));
+            }}
+          >
+            <X size={18} />
+          </button>
+        </aside>
+      ))}
       <nav className="navbar">
         <a
           className="brand"
@@ -1773,6 +1766,90 @@ function App() {
           ))}
         </div>
       </section>
+
+      {(houseInfo.wifiName ||
+        houseInfo.wifiPassword ||
+        houseInfo.checkIn ||
+        houseInfo.checkOut ||
+        houseInfo.entryInstructions[language] ||
+        houseInfo.houseRules[language] ||
+        visibleEmergencyContacts.length > 0) && (
+        <section className="guest-info-section">
+          <header className="guest-info-heading">
+            <span className="eyebrow dark-eyebrow">
+              <span className="eyebrow-line" />
+              {infoLabels.title}
+            </span>
+          </header>
+          <div className="guest-info-grid">
+            {(houseInfo.wifiName || houseInfo.wifiPassword) && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.wifi}</h3>
+                {houseInfo.wifiName && <p><strong>{houseInfo.wifiName}</strong></p>}
+                {houseInfo.wifiPassword && <p>{houseInfo.wifiPassword}</p>}
+              </article>
+            )}
+            {houseInfo.checkIn && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.checkIn}</h3>
+                <p>{houseInfo.checkIn}</p>
+              </article>
+            )}
+            {houseInfo.checkOut && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.checkOut}</h3>
+                <p>{houseInfo.checkOut}</p>
+              </article>
+            )}
+            {houseInfo.entryInstructions[language] && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.entry}</h3>
+                <p>{houseInfo.entryInstructions[language]}</p>
+              </article>
+            )}
+            {houseInfo.houseRules[language] && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.rules}</h3>
+                <p>{houseInfo.houseRules[language]}</p>
+              </article>
+            )}
+            {visibleEmergencyContacts.length > 0 && (
+              <article className="guest-info-card">
+                <h3>{infoLabels.emergency}</h3>
+                {visibleEmergencyContacts.map((contact) => (
+                  <p key={`${contact.name}-${contact.phone}`}>
+                    <strong>{contact.name}</strong>
+                    {contact.phone && <> · <a href={`tel:${contact.phone.replace(/\s/g, "")}`}>{contact.phone}</a></>}
+                    {contact.description[language] && <><br />{contact.description[language]}</>}
+                  </p>
+                ))}
+              </article>
+            )}
+          </div>
+        </section>
+      )}
+
+      {availableServices.length > 0 && (
+        <section className="services-section">
+          <header className="services-heading">
+            <span className="eyebrow dark-eyebrow">
+              <span className="eyebrow-line" />
+              {infoLabels.services}
+            </span>
+          </header>
+          <div className="services-grid">
+            {availableServices.map((service) => (
+              <article className="service-card" key={service.name}>
+                <div>
+                  <h3>{service.name}</h3>
+                  <p>{service.description[language]}</p>
+                </div>
+                <strong>{service.price}</strong>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="nearby-section">
         <header className="nearby-heading reveal">

@@ -1,0 +1,17 @@
+{
+  "wifiName": "",
+  "wifiPassword": "",
+  "checkIn": "",
+  "checkOut": "",
+  "entryInstructions": {
+    "en": "",
+    "de": "",
+    "hr": ""
+  },
+  "houseRules": {
+    "en": "",
+    "de": "",
+    "hr": ""
+  },
+  "emergencyContacts": []
+}

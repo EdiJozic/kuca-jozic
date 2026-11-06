@@ -1,5 +1,28 @@
 # React + TypeScript + Vite
 
+## Uređivanje sadržaja
+
+Administracija je dostupna na `/admin/`. Sadržaj web-stranice pohranjuje se u
+`public/data/places.json`, `public/data/info.json`, `public/data/services.json` i
+`public/data/notices.json` (na stranici su dostupni kao `/data/*.json`);
+fotografije prenesene kroz CMS spremaju se u `public/images/uploads/`. Izmjene se
+spremaju kao GitHub commit na granu `main`, nakon čega Netlify objavljuje novu
+verziju.
+
+Za prijavu u CMS potrebno je jednom postaviti GitHub OAuth aplikaciju i Netlify
+OAuth pružatelja. To **ne koristi Netlify Identity**:
+
+1. U GitHubu otvorite **Settings → Developer settings → OAuth Apps** i kreirajte
+   OAuth aplikaciju. Callback URL postavite na
+   `https://api.netlify.com/auth/done`.
+2. U Netlifyju otvorite **Project configuration → Security → OAuth**, dodajte
+   pružatelja GitHub te unesite Client ID i Client Secret iz GitHuba.
+3. Otvorite `/admin/` na objavljenoj Netlify stranici i prijavite se GitHub
+   računom koji ima pravo pisanja u repozitorij.
+
+Wi-Fi podaci uneseni u CMS objavljuju se u javnom JSON-u i dostupni su svakom
+posjetitelju stranice. Unesite ih samo ako je to namjerno.
+
 ## NOVASOL availability
 
 The availability calendar loads dates for property `CCC667` through the Netlify

@@ -1,0 +1,181 @@
+{
+  "places": [
+  {
+    "id": 1,
+    "name": "Zlatne Gorice",
+    "category": "restaurant",
+    "distance": "8 km",
+    "image": "https://www.zlatne-gorice.eu/assets/images/home-hero.jpg",
+    "description": {
+      "en": "Local flavours, thoughtful cooking and a beautiful countryside setting.",
+      "de": "Regionale Aromen, sorgfältige Küche und eine wunderschöne ländliche Umgebung.",
+      "hr": "Lokalni okusi, pažljivo pripremljena jela i prekrasno seosko okruženje."
+    },
+    "tip": {
+      "en": "Ask about the local seasonal specialities.",
+      "de": "Fragen Sie nach den saisonalen Spezialitäten der Region.",
+      "hr": "Raspitajte se o lokalnim sezonskim specijalitetima."
+    },
+    "address": "Zlatne Gorice, Varaždin",
+    "phone": "+385 42 123 456",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Zlatne+Gorice"
+  },
+  {
+    "id": 2,
+    "name": "Pizzeria Špan",
+    "category": "restaurant",
+    "distance": "6 km",
+    "image": "https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1000&q=85",
+    "description": {
+      "en": "A relaxed local favourite for pizza, pasta and an easy-going evening.",
+      "de": "Ein beliebter Ort für Pizza, Pasta und einen entspannten Abend.",
+      "hr": "Omiljeno lokalno mjesto za pizzu, tjesteninu i opuštenu večer."
+    },
+    "tip": {
+      "en": "A lovely choice for a casual family dinner.",
+      "de": "Eine schöne Wahl für ein entspanntes Abendessen mit der Familie.",
+      "hr": "Odličan izbor za opuštenu obiteljsku večeru."
+    },
+    "address": "Pizzeria Špan, Varaždin area",
+    "phone": "+385 42 345 678",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Pizzeria+Span"
+  },
+  {
+    "id": 3,
+    "name": "Restaurant Bernarda",
+    "category": "restaurant",
+    "distance": "11 km",
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85",
+    "description": {
+      "en": "Traditional home-style cooking in a warm, welcoming atmosphere.",
+      "de": "Traditionelle Hausmannskost in einer warmen, einladenden Atmosphäre.",
+      "hr": "Tradicionalna domaća kuhinja u toplom i ugodnom ambijentu."
+    },
+    "tip": {
+      "en": "Consider reserving a table on weekends.",
+      "de": "Am Wochenende empfiehlt sich eine Tischreservierung.",
+      "hr": "Vikendom preporučujemo rezervaciju stola."
+    },
+    "address": "Restaurant Bernarda",
+    "phone": "+385 42 234 567",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Restaurant+Bernarda"
+  },
+  {
+    "id": 4,
+    "name": "KTC Jalžabet",
+    "category": "shop",
+    "distance": "3 km",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ9f8Wcv-ZGSZmv6Oy-LVOTvrF7ye6tdT0o6wu4t_QuEh4OvLAb-5PUnPi&s=10",
+    "description": {
+      "en": "Your nearby stop for groceries, fresh produce and everyday essentials.",
+      "de": "Ihr Supermarkt in der Nähe für Lebensmittel und Dinge des täglichen Bedarfs.",
+      "hr": "Trgovina u blizini za namirnice, svježe proizvode i svakodnevne potrepštine."
+    },
+    "tip": {
+      "en": "A convenient option for stocking up after arrival.",
+      "de": "Ideal, um sich nach der Ankunft mit allem Nötigen einzudecken.",
+      "hr": "Praktično mjesto za nabavu nakon dolaska."
+    },
+    "address": "Jalžabet, Croatia",
+    "phone": "+385 42 456 789",
+    "maps": "https://www.google.com/maps/search/?api=1&query=KTC+Jalzabet"
+  },
+  {
+    "id": 5,
+    "name": "KFC Varaždin",
+    "category": "restaurant",
+    "distance": "13 km",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5AgrEcypvoW2hU8_D3gjC_gI__Of4OsdaKDbslCaWLhuXqajQvgNLKOn2&s=10",
+    "description": {
+      "en": "A familiar fast-food option when you want something quick and easy.",
+      "de": "Eine bekannte Fast-Food-Option für eine schnelle und unkomplizierte Mahlzeit.",
+      "hr": "Poznati fast-food izbor kada želite brz i jednostavan obrok."
+    },
+    "tip": {
+      "en": "Useful for a quick meal while visiting Varaždin.",
+      "de": "Praktisch für eine schnelle Mahlzeit bei einem Besuch in Varaždin.",
+      "hr": "Dobro za brz obrok tijekom posjeta Varaždinu."
+    },
+    "address": "Varaždin, Croatia",
+    "maps": "https://www.google.com/maps/search/?api=1&query=KFC+Varazdin"
+  },
+  {
+    "id": 6,
+    "name": "Lumini",
+    "category": "shop",
+    "distance": "14 km",
+    "image": "https://gipsmont-m.hr/wp-content/uploads/2020/11/Tvornica-zdrave-hrane-Biotrgovina-Lumini-centar-Varazdin-1.jpg",
+    "description": {
+      "en": "Shopping, dining and entertainment all in one place.",
+      "de": "Shopping, Gastronomie und Unterhaltung an einem Ort.",
+      "hr": "Kupovina, gastronomija i zabava na jednom mjestu."
+    },
+    "tip": {
+      "en": "A good rainy-day option for the whole family.",
+      "de": "Eine gute Idee für einen Regentag mit der ganzen Familie.",
+      "hr": "Dobar izbor za kišni dan s cijelom obitelji."
+    },
+    "address": "Lumini Shopping Centre",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Lumini+Varazdin"
+  },
+  {
+    "id": 7,
+    "name": "Kaufland Varaždin",
+    "category": "shop",
+    "distance": "8 km",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/6/65/Kaufland_Deutschland.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+    "description": {
+      "en": "A large supermarket with a wide range of groceries and essentials.",
+      "de": "Ein großer Supermarkt mit einer breiten Auswahl an Lebensmitteln.",
+      "hr": "Veliki supermarket s bogatom ponudom namirnica i potrepština."
+    },
+    "tip": {
+      "en": "Convenient for a larger grocery shop.",
+      "de": "Praktisch für einen größeren Einkauf.",
+      "hr": "Praktično za veću kupovinu namirnica."
+    },
+    "address": "Koprivnička 17, Varaždin",
+    "phone": "0800 223 223",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Kaufland+Varazdin"
+  },
+  {
+    "id": 8,
+    "name": "Plodine Ludbreg",
+    "category": "shop",
+    "distance": "15 km",
+    "image": "https://familymall.hr/wp-content/uploads/2021/04/Plodine-logo.png.webp",
+    "description": {
+      "en": "A practical supermarket for groceries and daily essentials.",
+      "de": "Ein praktischer Supermarkt für Lebensmittel und Dinge des täglichen Bedarfs.",
+      "hr": "Praktičan supermarket za namirnice i svakodnevne potrepštine."
+    },
+    "tip": {
+      "en": "Combine your shopping with a visit to Ludbreg.",
+      "de": "Verbinden Sie den Einkauf mit einem Besuch in Ludbreg.",
+      "hr": "Spojite kupovinu s posjetom Ludbregu."
+    },
+    "address": "Ludbreg, Croatia",
+    "phone": "+385 42 272 100",
+    "maps": "https://www.google.com/maps/search/?api=1&query=Plodine+Ludbreg"
+  },
+  {
+    "id": 9,
+    "name": "STOP SHOP Ludbreg",
+    "category": "shop",
+    "distance": "15 km",
+    "image": "https://cdn-emedjimurje.net.hr/wp-content/uploads/a6cf90e7b2ff4107c8d104c7e93d034b.jpg",
+    "description": {
+      "en": "A retail park with several stores for fashion, home and everyday shopping.",
+      "de": "Ein Einkaufspark mit Geschäften für Mode, Wohnen und den täglichen Bedarf.",
+      "hr": "Trgovački park s trgovinama za modu, dom i svakodnevnu kupovinu."
+    },
+    "tip": {
+      "en": "Several useful shops in one convenient stop.",
+      "de": "Mehrere praktische Geschäfte an einem Ort.",
+      "hr": "Više korisnih trgovina na jednome mjestu."
+    },
+    "address": "STOP SHOP Ludbreg",
+    "maps": "https://www.google.com/maps/search/?api=1&query=STOP+SHOP+Ludbreg"
+  }
+  ]
+}
