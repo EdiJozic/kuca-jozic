@@ -14,7 +14,7 @@ import {
   Globe2,
   Info,
   Mail,
-  MapPin,
+  MapPin, 
   Menu,
   MessageCircle,
   Phone,
@@ -172,7 +172,7 @@ const gallery = galleryCategories.map((category) => ({
 const copy = {
   en: {
     eyebrow: "A PRIVATE STAY · A LOCAL PERSPECTIVE",
-    headline: "Discover the art\nof slowing down.",
+    headline: "Holiday home Jožić\nnear Ludbreg",
     intro:
       "A little guide to the places we love. Thoughtfully selected for your stay at Kuća za odmor Jožić.",
     explore: "EXPLORE THE GUIDE",
@@ -199,7 +199,7 @@ const copy = {
       "From relaxed dinners to everyday essentials, discover the best of the area at your own pace.",
     title: "A stay to\nmake your own.",
     subtitle:
-      "Enjoy slow mornings by the pool, unwind in the spa and settle into the easy comfort of a home made for sharing.",
+      "Enjoy slow mornings by the private heated pool, unwind in the sauna and hot tub, and settle into comfortable family accommodation for up to six guests.",
     all: "Everything",
     restaurant: "Restaurants",
     shop: "Shopping",
@@ -273,7 +273,7 @@ const copy = {
   },
   de: {
     eyebrow: "EIN BESONDERER AUFENTHALT · LOKALE TIPPS",
-    headline: "Entdecken Sie\ndie Kunst der Ruhe.",
+    headline: "Ferienhaus Jožić\nbei Ludbreg",
     intro:
       "Ein kleiner Guide zu unseren Lieblingsorten. Mit Sorgfalt für Ihren Aufenthalt im Ferienhaus Jožić ausgewählt.",
     explore: "GUIDE ENTDECKEN",
@@ -300,7 +300,7 @@ const copy = {
       "Von entspannten Abendessen bis zum täglichen Einkauf – entdecken Sie die Region in Ihrem eigenen Tempo.",
     title: "Ein Aufenthalt\nganz nach Ihrem Geschmack.",
     subtitle:
-      "Genießen Sie ruhige Morgen am Pool, entspannen Sie im Wellnessbereich und fühlen Sie sich wie zu Hause.",
+      "Genießen Sie ruhige Morgen am privaten beheizten Pool, entspannen Sie in der Sauna und im Whirlpool und fühlen Sie sich in einer Unterkunft für bis zu sechs Gäste wie zu Hause.",
     all: "Alle Orte",
     restaurant: "Restaurants",
     shop: "Einkaufen",
@@ -374,7 +374,6 @@ const copy = {
   },
   hr: {
     eyebrow: "PRIVATNI SMJEŠTAJ · LOKALNI DOŽIVLJAJ",
-    headline: "Otkrijte ljepotu\nsporijeg ritma.",
     intro:
       "Mali vodič kroz naša omiljena mjesta, pažljivo odabrana za vaš boravak u Kući za odmor Jožić.",
     explore: "ISTRAŽITE VODIČ",
@@ -400,8 +399,9 @@ const copy = {
     neighborhoodIntro:
       "Od opuštenih večera do svakodnevnih potrepština, istražite najbolje u okolici svojim tempom.",
     title: "Boravak po\nvašoj mjeri.",
+    headline: "Kuća za odmor Jožić\nu Ludbregu",
     subtitle:
-      "Uživajte u mirnim jutrima uz bazen, opustite se u spa zoni i osjećajte se kao kod kuće.",
+      "Uživajte u mirnim jutrima uz privatni grijani bazen, opustite se u sauni i hidromasažnoj kadi te boravite u udobnoj kući za najviše šest gostiju.",
     all: "Sve",
     restaurant: "Restorani",
     shop: "Trgovine",
@@ -1041,7 +1041,11 @@ function NeighborhoodPage({
 }
 
 function App() {
-  const [language, setLanguage] = useState<Language>("hr");
+  const [language, setLanguageState] = useState<Language>(() => {
+    const requested = new URLSearchParams(window.location.search).get("lang");
+    if (requested === "en" || requested === "de" || requested === "hr") return requested;
+    return "hr";
+  });
   const [category, setCategory] = useState<Category>("all");
   const [selected, setSelected] = useState<Place | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1072,6 +1076,13 @@ function App() {
     imageIndex: number;
   } | null>(null);
   const t = copy[language];
+
+  const setLanguage = (nextLanguage: Language) => {
+    setLanguageState(nextLanguage);
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", nextLanguage);
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1117,6 +1128,65 @@ function App() {
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    const seo = {
+      hr: {
+        title: "Kuća za odmor Jožić | Privatni bazen i wellness – Ludbreg",
+        description: "Kuća za odmor Jožić u Ludbregu: grijani privatni bazen, sauna, hidromasažna kada i smještaj za do 6 gostiju.",
+        ogTitle: "Kuća za odmor Jožić – Ludbreg",
+      },
+      de: {
+        title: "Ferienhaus Jožić | Privater Pool und Wellness – Ludbreg",
+        description: "Ferienhaus Jožić bei Ludbreg: privater beheizter Pool, Sauna, Whirlpool und Unterkunft für bis zu 6 Gäste.",
+        ogTitle: "Ferienhaus Jožić – Ludbreg",
+      },
+      en: {
+        title: "Holiday Home Jožić | Private Pool and Spa – Ludbreg",
+        description: "Holiday home Jožić near Ludbreg: private heated pool, sauna, hot tub and accommodation for up to 6 guests.",
+        ogTitle: "Holiday Home Jožić – Ludbreg",
+      },
+    }[language];
+    const baseUrl = "https://kucazaodmorjozic.netlify.app/";
+    const canonicalUrl = `${baseUrl}?lang=${language}`;
+    const setMeta = (selector: string, attribute: string, content: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!element) {
+        element = document.createElement("meta");
+        if (selector.startsWith("meta[name")) element.name = selector.match(/name="([^"]+)"/)?.[1] ?? "";
+        if (selector.startsWith("meta[property")) element.setAttribute("property", selector.match(/property="([^"]+)"/)?.[1] ?? "");
+        document.head.appendChild(element);
+      }
+      element.setAttribute(attribute, content);
+    };
+
+    document.title = seo.title;
+    setMeta('meta[name="description"]', "content", seo.description);
+    setMeta('meta[name="robots"]', "content", "index, follow");
+    setMeta('meta[property="og:title"]', "content", seo.ogTitle);
+    setMeta('meta[property="og:description"]', "content", seo.description);
+    setMeta('meta[property="og:url"]', "content", canonicalUrl);
+    setMeta('meta[property="og:locale"]', "content", language === "hr" ? "hr_HR" : language === "de" ? "de_DE" : "en_GB");
+    setMeta('meta[name="twitter:title"]', "content", seo.ogTitle);
+    setMeta('meta[name="twitter:description"]', "content", seo.description);
+
+    const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (canonical) canonical.href = canonicalUrl;
+
+    document.head.querySelectorAll<HTMLLinkElement>('link[hreflang]').forEach((link) => link.remove());
+    (["hr", "de", "en"] as Language[]).forEach((hreflang) => {
+      const link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = hreflang;
+      link.href = `${baseUrl}?lang=${hreflang}`;
+      document.head.appendChild(link);
+    });
+    const defaultLink = document.createElement("link");
+    defaultLink.rel = "alternate";
+    defaultLink.hreflang = "x-default";
+    defaultLink.href = baseUrl;
+    document.head.appendChild(defaultLink);
+  }, [language, currentPage]);
 
   const filteredPlaces = places.filter(
     (place) => place.visible !== false && (category === "all" || place.category === category),
@@ -1306,7 +1376,7 @@ function App() {
             navigateTo("home");
           }}
         >
-          <img className="brand-logo" src={logo} alt="Kuća za odmor Jožić" />
+          <img className="brand-logo" src={logo} alt={language === "hr" ? "Kuća za odmor Jožić" : language === "de" ? "Ferienhaus Jožić" : "Holiday Home Jožić"} />
           <span className="brand-text">
             STAY GUIDE
             <small>KUĆA ZA ODMOR JOŽIĆ</small>
@@ -1447,7 +1517,7 @@ function App() {
                         aria-label={`${section.title[language]} ${imageIndex + 1}`}
                         style={{ animationDelay: `${Math.min(imageIndex, 5) * 70}ms` }}
                       >
-                        <img src={image.src} alt={`${section.title[language]} ${imageIndex + 1}`} loading="lazy" />
+                        <img src={image.src} alt={`${section.title[language]} – Kuća za odmor Jožić, fotografija ${imageIndex + 1}`} loading="lazy" />
                         <span className="gallery-image-overlay">
                           <span>{section.title[language]}</span>
                           <span>0{imageIndex + 1}</span>
@@ -1663,7 +1733,7 @@ function App() {
                 }}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <img src={image.src} alt={section.title[language]} loading="lazy" />
+                <img src={image.src} alt={`${section.title[language]} – Kuća za odmor Jožić`} loading="lazy" />
                 <span className="home-highlight-overlay">
                   <span>0{index + 1} / {section.images.length.toString().padStart(2, "0")}</span>
                   <strong>{section.title[language]}</strong>
@@ -1896,7 +1966,7 @@ function App() {
           event.preventDefault();
           navigateTo("home");
         }}>
-          <img className="brand-logo" src={logo} alt="Kuća za odmor Jožić" />
+          <img className="brand-logo" src={logo} alt={language === "hr" ? "Kuća za odmor Jožić" : language === "de" ? "Ferienhaus Jožić" : "Holiday Home Jožić"} />
         </a>
         <span className="footer-note">{t.footer}</span>
         <a
@@ -1939,7 +2009,7 @@ function App() {
           </button>
           <img
             src={gallery[selectedGalleryImage.categoryIndex].images[selectedGalleryImage.imageIndex].src}
-            alt={gallery[selectedGalleryImage.categoryIndex].images[selectedGalleryImage.imageIndex].alt}
+            alt={`${gallery[selectedGalleryImage.categoryIndex].title[language]} – Kuća za odmor Jožić, fotografija ${selectedGalleryImage.imageIndex + 1}`}
             onClick={(event) => event.stopPropagation()}
           />
           <button
